@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
-    public function getLogs() {
-        $logStr = file_get_contents(storage_path('logs/lumen-2020-09-07.log'));
+    public function getLogs(Request $request) {
+        $logStr = file_get_contents(storage_path('logs/lumen-'.$request->get('date').'.log'));
         dd($logStr);
     }
 
