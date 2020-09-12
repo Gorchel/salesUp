@@ -1,10 +1,6 @@
 <?php
 return [
-    'host' => '127.0.0.1',
-    'userMan' => 'manpanmonWebUser',
-    'passMan' => 'NrtTqUwEqOMMbEOLuqfW7wgod5zRr',
-
-    'max_log_files' => 7,
+    'url' => 'https://app.salesap.ru/api/v1/',
     'log_files_mode' => 0666,
     'log_level' => 'debug',
 ];
