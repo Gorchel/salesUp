@@ -83,13 +83,17 @@
         });
 
         function init() {
+            var start_coordinates = [$('[name="center_latitude"]').val(), $('[name="center_longitude"]').val()];
+
             var myPlacemark,
                 myMap = new ymaps.Map('map', {
-                    center: [$('[name="center_latitude"]').val(), $('[name="center_longitude"]').val()],
-                    zoom: 14
+                    center: start_coordinates,
+                    zoom: 16
                 }, {
                     searchControlProvider: 'yandex#search'
                 });
+
+            setPlacemark(start_coordinates);
 
             // Слушаем клик на карте.
             myMap.events.add('click', function (e) {
@@ -105,12 +109,7 @@
                 }
                 // Если нет – создаем.
                 else {
-                    myPlacemark = createPlacemark(coords);
-                    myMap.geoObjects.add(myPlacemark);
-                    // Слушаем событие окончания перетаскивания на метке.
-                    myPlacemark.events.add('dragend', function () {
-                        getAddress(myPlacemark.geometry.getCoordinates());
-                    });
+                    setPlacemark(coords);
                 }
 
                 getAddress(coords);
@@ -118,10 +117,19 @@
                 getDisctrict(coords);
             });
 
+            function setPlacemark(coords) {
+                myPlacemark = createPlacemark(coords);
+                myMap.geoObjects.add(myPlacemark);
+                // Слушаем событие окончания перетаскивания на метке.
+                myPlacemark.events.add('dragend', function () {
+                    getAddress(myPlacemark.geometry.getCoordinates());
+                });
+            }
+
             // Создание метки.
             function createPlacemark(coords) {
                 return new ymaps.Placemark(coords, {
-                    iconCaption: 'поиск...'
+                    // iconCaption: 'поиск...'
                 }, {
                     preset: 'islands#violetDotIconWithCaption',
                     draggable: true
