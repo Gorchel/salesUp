@@ -25,7 +25,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
-                <div id="map" style="width: 500px; height: 400px; display: inline-block;"></div>
+                <div id="map" style="width: 100%; height: 400px; display: inline-block;"></div>
             </div>
         </div>
 
