@@ -55,6 +55,16 @@ class WebhookController extends Controller
     {
         Log::info(json_encode($request->all()));
 
-        return view('objects.ya');
+        $id = $request->get('ids')[0];
+        $token = $request->get('token');
+        $type = $request->get('type');
+
+        $data = [
+            'token' => $token,
+            'id' => $id,
+            'type' => $type,
+        ];
+
+        return view('objects.ya', $data);
     }
 }
