@@ -65,16 +65,18 @@ class WebhookController extends Controller
             'type' => $type,
         ];
 
-        $salesupHandler = new SalesupHandler($token);
-        $response = $salesupHandler->getObjects($id);
-        $attribute = $response['attributes'];
+        if (!empty($id)) {
+            $salesupHandler = new SalesupHandler($token);
+            $response = $salesupHandler->getObjects($id);
+            $attribute = $response['attributes'];
 
-        if (!empty($attribute['longitude'])) {
-            $data['longitude'] = $attribute['longitude'];
-        }
+            if (!empty($attribute['longitude'])) {
+                $data['longitude'] = $attribute['longitude'];
+            }
 
-        if (!empty($attribute['latitude'])) {
-            $data['latitude'] = $attribute['latitude'];
+            if (!empty($attribute['latitude'])) {
+                $data['latitude'] = $attribute['latitude'];
+            }
         }
 
         return view('objects.ya', $data);

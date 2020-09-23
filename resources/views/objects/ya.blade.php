@@ -34,8 +34,8 @@
                 <div class="col-lg-10 offset-lg-1 text-center">
                     <input type="hidden" name="token" value="{{$token}}">
                     <input type="hidden" name="id" value="{{$id}}">
-                    <input type="hidden" name="center_longitude" value="{{!empty($longitude) ? $longitude : 55.753994}}">
-                    <input type="hidden" name="center_latitude" value="{{!empty($latitude) ? $latitude : 37.622093}}">
+                    <input type="hidden" name="center_longitude" value="{{!empty($longitude) ? $longitude : 37.622093}}">
+                    <input type="hidden" name="center_latitude" value="{{!empty($latitude) ? $latitude : 55.753994}}">
 {{--                    <input type="btn" class="btn btn-success" value="Сохранить">--}}
                 </div>
             </div>
@@ -85,7 +85,7 @@
         function init() {
             var myPlacemark,
                 myMap = new ymaps.Map('map', {
-                    center: [$('[name="center_longitude"]').val(), $('[name="center_longitude"]').val()],
+                    center: [$('[name="center_latitude"]').val(), $('[name="center_longitude"]').val()],
                     zoom: 14
                 }, {
                     searchControlProvider: 'yandex#search'
