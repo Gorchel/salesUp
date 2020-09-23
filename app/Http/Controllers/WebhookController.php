@@ -6,15 +6,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Classes\SalesUp\SalesupHandler;
 
+/**
+ * Class WebhookController
+ * @package App\Http\Controllers
+ */
 class WebhookController extends Controller
 {
+    /**
+     * Просмотр логов
+     * @param Request $request
+     */
     public function getLogs(Request $request)
     {
         $logStr = file_get_contents(storage_path('logs/lumen-'.$request->get('date').'.log'));
         dd($logStr);
     }
 
-    public function webhook(Request $request) {
+    /**
+     * Обновление Контактов
+     * @param Request $request
+     * @return int|void
+     */
+    public function webhook(Request $request)
+    {
         //{"ids":["1678688"],"token":"Ph-AhX3_sc1GGkW2h6QLxiGxnH6DCBA8SnthhTRa6aA","type":"deals","user_id":"54273"}
         Log::info(json_encode($request->all()));
 
@@ -31,5 +45,16 @@ class WebhookController extends Controller
         }
 
         return 1;
+    }
+
+    /**
+     * Получение яндекс карты
+     * @param Request $request
+     */
+    public function webhookObjects(Request $request)
+    {
+        Log::info(json_encode($request->all()));
+
+        return view('objects.ya');
     }
 }

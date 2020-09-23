@@ -17,3 +17,4 @@ $router->get('/', function () use ($router) {
 
 $router->get('/getLogs', ['uses' => 'WebhookController@getLogs']);
 $router->get('/webhook', ['uses' => 'WebhookController@webhook']);
+$router->get('/webhook_objects', ['uses' => 'WebhookController@webhookObjects']);
