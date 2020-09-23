@@ -64,8 +64,6 @@ class SalesupHandler
             }
         }
 
-
-
         //Получаем контакты сделки
         $dealContactsRelations = $dealRelations['contacts'];
 //        $dealContacts = [];
@@ -81,5 +79,14 @@ class SalesupHandler
         $response = $this->methods->dealUpdate($dealId, array_unique($companyContacts));
 
         return $response;
+    }
+
+    /**
+     * @param int $dealId
+     * @return array
+     */
+    public function getObjects(int $objectId)
+    {
+        return $this->methods->getObject($objectId);
     }
 }

@@ -118,6 +118,26 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param int $objectId
+     */
+    public function getObject(int $objectId)
+    {
+        $path = 'estate-properties/'.$objectId;
+
+        $data = [
+//            'include' => 'companies,contacts',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getDeals.');
+
+        return $response['data'];
+    }
+
         /**
      * @param $path
      * @param array $params
