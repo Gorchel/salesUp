@@ -178,7 +178,7 @@
                     // Добавляем коллекцию найденных геообъектов на карту.
                     // console.log(res.geoObjects.get(0).getPremise());
                     var objects = res.geoObjects;
-                    $('[name="metro"]').val(objects.get(0).getAddressLine().replace("Россия, Москва, ", ""));
+                    $('[name="metro"]').val(splitAddress(objects.get(0).getAddressLine()));
 
                     // myMap.geoObjects.add(objects);
                     // Масштабируем карту на область видимости коллекции.
@@ -190,8 +190,14 @@
                 ymaps.geocode(coords, {
                     kind: 'district',
                 }).then(function (res) {
-                    $('[name="district"]').val(res.geoObjects.get(0).getAddressLine().replace("Россия, Москва, ", ""));
+                    $('[name="district"]').val(splitAddress(res.geoObjects.get(0).getAddressLine()));
                 });
+            }
+
+            function splitAddress(str) {
+                var strArr = str.split(',');
+
+                return strArr[strArr.length - 1];
             }
         }
     </script>
