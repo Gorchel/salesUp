@@ -192,7 +192,7 @@
                     // Добавляем коллекцию найденных геообъектов на карту.
                     // console.log(res.geoObjects.get(0).getPremise());
                     var objects = res.geoObjects;
-                    $('[name="metro"]').val(splitAddress(objects.get(0).getAddressLine()));
+                    $('[name="metro"]').val(splitLastAddress(objects.get(0).getAddressLine()));
 
                     // myMap.geoObjects.add(objects);
                     // Масштабируем карту на область видимости коллекции.
@@ -201,17 +201,33 @@
             }
 
             function getDisctrict(coords) {
+                $('[name="district"]').val('');
+
                 ymaps.geocode(coords, {
                     kind: 'district',
                 }).then(function (res) {
-                    $('[name="district"]').val(splitAddress(res.geoObjects.get(0).getAddressLine()));
+                    // console.log(replaceAddress(res.geoObjects.get(0).getAddressLine()));
+                    $('[name="district"]').val(replaceAddress(res.geoObjects.get(0).getAddressLine()));
                 });
             }
 
-            function splitAddress(str) {
+            function splitLastAddress(str) {
                 var strArr = str.split(',');
 
                 return strArr[strArr.length - 1];
+            }
+
+            function replaceAddress(str) {
+                var strArr = str.split(','),
+                    length = strArr.length,
+                    returnStr = '';
+
+
+                for (var i = 2; i < length; i++) {
+                    returnStr = returnStr + strArr[i] + ',';
+                }
+
+                return returnStr.replace(/,$/,"");
             }
         }
     </script>
