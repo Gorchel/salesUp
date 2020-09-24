@@ -68,6 +68,7 @@ class WebhookController extends Controller
         if (!empty($id)) {
             $salesupHandler = new SalesupHandler($token);
             $response = $salesupHandler->getObjects($id);
+
             $attribute = $response['attributes'];
 
             if (!empty($attribute['longitude'])) {
@@ -80,5 +81,20 @@ class WebhookController extends Controller
         }
 
         return view('objects.ya', $data);
+    }
+
+    public function webhookPostObjects(Request $request) {
+        $salesupHandler = new SalesupHandler($request->get('token'));
+
+        $updateData = [
+            'district' => $request->get('district'),
+            'latitude' => $request->get('latitude'),
+            'longitude' => $request->get('longitude'),
+            'metro' => $request->get('metro'),
+        ];
+
+        $salesupHandler->updateObject($request->get('id'), $updateData);
+
+        return redirect('/webhook_objects');
     }
 }

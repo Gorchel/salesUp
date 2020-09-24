@@ -82,11 +82,20 @@ class SalesupHandler
     }
 
     /**
-     * @param int $dealId
+     * @param int $objectId
      * @return array
      */
     public function getObjects(int $objectId)
     {
         return $this->methods->getObject($objectId);
+    }
+
+    /**
+     * @param int $objectId
+     * @return array
+     */
+    public function updateObject(int $objectId, array $updateData)
+    {
+        return $this->methods->objectUpdate($objectId, $updateData);
     }
 }

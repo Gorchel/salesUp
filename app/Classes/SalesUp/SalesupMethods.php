@@ -138,6 +138,48 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param int $dealId
+     */
+    public function objectUpdate(int $objectId, array $updateData)
+    {
+        $path = 'estate-properties/'.$objectId;
+
+        $data = [];
+
+        if (isset($updateData['district'])) {
+            $data['district'] = $updateData['district'];
+        }
+
+        if (isset($updateData['metro'])) {
+            $data['subway-name'] = $updateData['metro'];
+        }
+
+        if (isset($updateData['latitude'])) {
+            $data['latitude'] = $updateData['latitude'];
+        }
+
+        if (isset($updateData['longitude'])) {
+            $data['longitude'] = $updateData['longitude'];
+        }
+
+        $body = [
+            'data' => [
+                'type' => 'estate-properties',
+                'id' => $objectId,
+                'attributes' => $data,
+            ],
+        ];
+
+        $jsonResponse = $this->patchRequest($path, json_encode($body));
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response);
+
+        return $response['data'];
+    }
+
         /**
      * @param $path
      * @param array $params
