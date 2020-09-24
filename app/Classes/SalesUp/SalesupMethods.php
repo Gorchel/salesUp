@@ -126,14 +126,14 @@ class SalesupMethods
         $path = 'estate-properties/'.$objectId;
 
         $data = [
-//            'include' => 'companies,contacts',
+//            'include' => 'status,source,orders,deals',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
 
         $response = json_decode($jsonResponse, true);
 
-        $this->handleError($response, '. Method getDeals.');
+        $this->handleError($response, '. Method getObject.');
 
         return $response['data'];
     }
@@ -149,10 +149,22 @@ class SalesupMethods
 
         if (isset($updateData['district'])) {
             $data['district'] = $updateData['district'];
+
+            if (!isset($data['customs'])) {
+                $data['customs'] = [];
+            }
+
+            $data['customs']['custom-64791'] = $updateData['district'];
         }
 
         if (isset($updateData['metro'])) {
             $data['subway-name'] = $updateData['metro'];
+
+            if (!isset($data['customs'])) {
+                $data['customs'] = [];
+            }
+
+            $data['customs']['custom-64792'] = $updateData['metro'];
         }
 
         if (isset($updateData['latitude'])) {
