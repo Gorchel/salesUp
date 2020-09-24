@@ -175,6 +175,14 @@ class SalesupMethods
             $data['longitude'] = $updateData['longitude'];
         }
 
+        if (isset($updateData['latitude']) && isset($updateData['longitude'])) {
+            if (!isset($data['customs'])) {
+                $data['customs'] = [];
+            }
+
+            $data['customs']['custom-65599'] = $updateData['latitude'].','.$updateData['longitude'];
+        }
+
         $body = [
             'data' => [
                 'type' => 'estate-properties',
