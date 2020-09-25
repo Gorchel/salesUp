@@ -1,85 +1,77 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <script
-        src="https://code.jquery.com/jquery-2.2.4.min.js"
-        integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=1a73413b-9630-45e3-a6a0-657353bd6219&lang=ru_RU" type="text/javascript">
-    </script>
-    <title>SalesUp</title>
+@extends('layouts')
+
+@section('css')
     <style>
         .form-group {
             margin-bottom: 2px;
         }
     </style>
-</head>
-<body>
-    <div class="container">
-        <form action="/webhook_objects" method="POST">
+@show
+
+@section("content")
+
+    <form action="/webhook_objects" method="POST">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div id="map" style="width: 100%; height: 400px; display: inline-block;"></div>
+            </div>
+        </div>
+
+        <input type="hidden" name="center_longitude" value="{{!empty($longitude) ? $longitude : 37.622093}}">
+        <input type="hidden" name="center_latitude" value="{{!empty($latitude) ? $latitude : 55.753994}}">
+
+        @if ($type == 'estate-properties')
             <div class="row">
-                <div class="col-md-12 text-center">
-                    <div id="map" style="width: 100%; height: 400px; display: inline-block;"></div>
+                <div class="col-lg-10 offset-lg-1 text-center">
+                    <input type="hidden" name="token" value="{{$token}}">
+                    <input type="hidden" name="id" value="{{$id}}">
                 </div>
             </div>
-
-            <input type="hidden" name="center_longitude" value="{{!empty($longitude) ? $longitude : 37.622093}}">
-            <input type="hidden" name="center_latitude" value="{{!empty($latitude) ? $latitude : 55.753994}}">
-
-            @if ($type == 'estate-properties')
-                <div class="row">
-                    <div class="col-lg-10 offset-lg-1 text-center">
-                        <input type="hidden" name="token" value="{{$token}}">
-                        <input type="hidden" name="id" value="{{$id}}">
-                    </div>
-                </div>
-                <hr/>
-                <div class="row">
-                    <div class="col-lg-10 offset-lg-1 text-center">
-                        <input type="submit" class="btn btn-sm btn-info" value="Сохранить">
-                    </div>
-                </div>
-            @endif
+            <hr/>
             <div class="row">
-                <div class="col-lg-6 offset-lg-3">
-                    <div class="row">
-                        <div class="col-lg-12 form-group">
-                            <label for="Адрес">Адрес</label>
-                            <input type="text" class="form-control input-sm" name="address" readonly="readonly" value="">
-                        </div>
+                <div class="col-lg-10 offset-lg-1 text-center">
+                    <input type="submit" class="btn btn-sm btn-info" value="Сохранить">
+                </div>
+            </div>
+        @endif
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="row">
+                    <div class="col-lg-12 form-group">
+                        <label for="Адрес">Адрес</label>
+                        <input type="text" class="form-control input-sm" name="address" readonly="readonly" value="">
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6 form-group">
-                            <label for="Широта">Широта</label>
-                            <input type="text" class="form-control input-sm" name="latitude" readonly="readonly" value="">
-                        </div>
-                        <div class="col-lg-6 form-group">
-                            <label for="Долгота">Долгота</label>
-                            <input type="text" class="form-control input-sm" name="longitude" readonly="readonly" value="">
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 form-group">
+                        <label for="Широта">Широта</label>
+                        <input type="text" class="form-control input-sm" name="latitude" readonly="readonly" value="">
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12 form-group">
-                            <label for="Метро">Метро</label><input type="text" class="form-control input-sm" name="metro" readonly="readonly" value="">
-                        </div>
+                    <div class="col-lg-6 form-group">
+                        <label for="Долгота">Долгота</label>
+                        <input type="text" class="form-control input-sm" name="longitude" readonly="readonly" value="">
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12 form-group">
-                            <label for="Район">Район</label>
-                            <input type="text" name="district" class="form-control input-sm" readonly="readonly" value="">
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 form-group">
+                        <label for="Метро">Метро</label><input type="text" class="form-control input-sm" name="metro" readonly="readonly" value="">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 form-group">
+                        <label for="Район">Район</label>
+                        <input type="text" name="district" class="form-control input-sm" readonly="readonly" value="">
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
-</body>
+        </div>
+    </form>
+    @parent
+@overwrite
+
+@section('js')
+    @parent
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=1a73413b-9630-45e3-a6a0-657353bd6219&lang=ru_RU" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -231,5 +223,4 @@
             }
         }
     </script>
-
-</html>
+@overwrite

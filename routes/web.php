@@ -19,3 +19,6 @@ $router->get('/getLogs', ['uses' => 'WebhookController@getLogs']);
 $router->get('/webhook', ['uses' => 'WebhookController@webhook']);
 $router->get('/webhook_objects', ['uses' => 'WebhookController@webhookObjects']);
 $router->post('/webhook_objects', ['uses' => 'WebhookController@webhookPostObjects']);
+
+$router->get('/webhook_deals_objects', ['uses' => 'WebhookController@webhookUpdateObjectsContacts']);
+$router->get('/weebhook_estate_filter', ['uses' => 'WebhookController@webhookEstateFilter']);

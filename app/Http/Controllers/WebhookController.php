@@ -29,7 +29,26 @@ class WebhookController extends Controller
      */
     public function webhook(Request $request)
     {
+        return $this->updateDealByType($request, 'company');
+    }
+
+    /**
+     * @param Request $request
+     * @return int|void
+     */
+    public function webhookUpdateObjectsContacts(Request $request)
+    {
         //{"ids":["1678688"],"token":"Ph-AhX3_sc1GGkW2h6QLxiGxnH6DCBA8SnthhTRa6aA","type":"deals","user_id":"54273"}
+        return $this->updateDealByType($request, 'object');
+    }
+
+    /**
+     * @param Request $request
+     * @param string $type
+     * @return array|void
+     */
+    protected function updateDealByType(Request $request, string $type)
+    {
         Log::info(json_encode($request->all()));
 
         if ($request->get('type') !== 'deals') {
@@ -41,10 +60,10 @@ class WebhookController extends Controller
 
         foreach ($dealsIdsArrays as $dealId) {
             $salesupHandler = new SalesupHandler($token);
-            $response = $salesupHandler->updateDeals($dealId);
+            $response = $salesupHandler->updateDeals($dealId, $type);
         }
 
-        return 1;
+        return $response;
     }
 
     /**
@@ -83,6 +102,27 @@ class WebhookController extends Controller
         return view('objects.ya', $data);
     }
 
+    public function webhookEstateFilter(Request $request)
+    {
+        Log::info(json_encode($request->all()));
+
+        $id = $request->get('ids')[0];
+        $token = $request->get('token');
+        $type = $request->get('type');
+
+        $data = [
+            'token' => $token,
+            'id' => $id,
+            'type' => $type,
+        ];
+
+        return view('objects.filter', $data);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Laravel\Lumen\Http\Redirector
+     */
     public function webhookPostObjects(Request $request) {
         $salesupHandler = new SalesupHandler($request->get('token'));
 
