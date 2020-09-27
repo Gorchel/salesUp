@@ -102,23 +102,6 @@ class WebhookController extends Controller
         return view('objects.ya', $data);
     }
 
-    public function webhookEstateFilter(Request $request)
-    {
-        Log::info(json_encode($request->all()));
-
-        $id = $request->get('ids')[0];
-        $token = $request->get('token');
-        $type = $request->get('type');
-
-        $data = [
-            'token' => $token,
-            'id' => $id,
-            'type' => $type,
-        ];
-
-        return view('objects.filter', $data);
-    }
-
     /**
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Laravel\Lumen\Http\Redirector

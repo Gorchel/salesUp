@@ -49,6 +49,26 @@ class SalesupMethods
     /**
      * @param int $dealId
      */
+    public function getOrders()
+    {
+        $path = 'orders';
+
+        $data = [
+//            'include' => 'companies,contacts',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getOrders.');
+
+        return $response['data'];
+    }
+
+    /**
+     * @param int $dealId
+     */
     public function dealUpdate(int $dealId, array $contacts)
     {
         $path = 'deals/'.$dealId;
@@ -84,6 +104,26 @@ class SalesupMethods
     }
 
     /**
+     * @param int $dealId
+     */
+    public function dealCreate(array $data)
+    {
+        $path = 'deals';
+
+        $data['type'] = 'deals';
+
+        $body = ['data' => $data];
+
+        $jsonResponse = $this->postRequest($path, json_encode($body));
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response);
+
+        return $response['data'];
+    }
+
+    /**
      * @param int $companyId
      */
     public function getCompany(int $companyId)
@@ -99,6 +139,32 @@ class SalesupMethods
         $response = json_decode($jsonResponse, true);
 
         $this->handleError($response, '. Method getDeals.');
+
+        return $response['data'];
+    }
+
+    /**
+     * @param array|null $filter
+     * @return
+     * @throws \Exception
+     */
+    public function getCompanies(array $filter = null)
+    {
+        $path = 'companies';
+
+        $data = [
+            'include' => 'contacts',
+        ];
+
+        if (!empty($filter)) {
+            $data['filter'] = $filter;
+        }
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getCompanies.');
 
         return $response['data'];
     }
@@ -126,7 +192,7 @@ class SalesupMethods
         $path = 'estate-properties/'.$objectId;
 
         $data = [
-//            'include' => 'status,source,orders,deals',
+//            'include' => 'deals',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
@@ -134,6 +200,35 @@ class SalesupMethods
         $response = json_decode($jsonResponse, true);
 
         $this->handleError($response, '. Method getObject.');
+
+        return $response['data'];
+    }
+
+    public function attachDealToObject(int $dealId, int $objectId) {
+        $path = 'estate-properties/'.$objectId;
+
+        $body = [
+            'data' => [
+                'type' => 'estate-properties',
+                'id' => $objectId,
+                'relationships' => [
+                    'deals' => [
+                        'data' => [
+                            [
+                                'id' => $dealId,
+                                'type' => 'deals',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $jsonResponse = $this->patchRequest($path, json_encode($body));
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response);
 
         return $response['data'];
     }

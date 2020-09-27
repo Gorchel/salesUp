@@ -15,10 +15,12 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+$router->get('/test', ['uses' => 'TestController@index']);
 $router->get('/getLogs', ['uses' => 'WebhookController@getLogs']);
 $router->get('/webhook', ['uses' => 'WebhookController@webhook']);
 $router->get('/webhook_objects', ['uses' => 'WebhookController@webhookObjects']);
 $router->post('/webhook_objects', ['uses' => 'WebhookController@webhookPostObjects']);
 
-$router->get('/webhook_deals_objects', ['uses' => 'WebhookController@webhookUpdateObjectsContacts']);
-$router->get('/weebhook_estate_filter', ['uses' => 'WebhookController@webhookEstateFilter']);
+$router->get('/webhook_deals_objects', ['uses' => 'WebhookObjectsController@webhookUpdateObjectsContacts']);
+$router->get('/weebhook_estate_filter', ['uses' => 'WebhookObjectsController@webhookEstateFilter']);
+$router->get('/weebhook_estate_get', ['uses' => 'WebhookObjectsController@webhookEstateGet']);

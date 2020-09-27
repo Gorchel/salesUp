@@ -19,7 +19,7 @@ class SalesupHandler
     /**
      * @var SalesupMethods
      */
-    protected $methods;
+    public $methods;
 
     /**
      * SalesupHandler constructor.
@@ -52,16 +52,7 @@ class SalesupHandler
         foreach ($companyData as $companyId) {
             $company = $this->methods->getCompany($companyId['id']);
 
-            $companyRelations = $company['relationships'];
-            $companyCompaniesRelations = $companyRelations['contacts'];
-
-            if (!isset($companyCompaniesRelations['data'])) {
-                continue;
-            }
-
-            foreach ($companyCompaniesRelations['data'] as $contacts) {
-                $companyContacts[] = $contacts['id'];
-            }
+            $companyContacts = $this->getContactByCompany($company, $companyContacts);
         }
 
         //Получаем контакты сделки
@@ -79,6 +70,26 @@ class SalesupHandler
         $response = $this->methods->dealUpdate($dealId, array_unique($companyContacts));
 
         return $response;
+    }
+
+    /**
+     * @param $company
+     * @return array|mixed
+     */
+    public function getContactByCompany($company, array &$outputContacts)
+    {
+        $companyRelations = $company['relationships'];
+        $companyCompaniesRelations = $companyRelations['contacts'];
+
+        if (!isset($companyCompaniesRelations['data'])) {
+            return 0;
+        }
+
+        foreach ($companyCompaniesRelations['data'] as $contacts) {
+            $outputContacts[] = $contacts['id'];
+        }
+
+        return 1;
     }
 
     /**
