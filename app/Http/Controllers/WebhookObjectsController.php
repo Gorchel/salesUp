@@ -92,7 +92,7 @@ class WebhookObjectsController extends Controller
         if (empty($companies)) {
             return "Компании не найдены";
         }
-        
+
         //Получаем контакты по компаниям
         $companyContacts = [];
         $companyData = [];
