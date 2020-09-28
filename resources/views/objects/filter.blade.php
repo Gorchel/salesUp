@@ -18,19 +18,19 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
                     <label for="">По площади (кв/м)</label><br/>
-                    <b>oт</b>&nbsp;<input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до</b>
+                    <b>oт %</b>&nbsp;<input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
                     <label for="">Арендная ставка в месяц</label><br/>
-                    <b>oт</b>&nbsp;<input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до</b>
+                    <b>oт %</b>&nbsp;<input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
                     <label for="">Арендная ставка за кв. м в месяц</label><br/>
-                    <b>oт</b>&nbsp;<input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до</b>
+                    <b>oт %</b>&nbsp;<input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
                 </div>
             </div>
             <div class="row">
