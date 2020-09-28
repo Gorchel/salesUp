@@ -35,6 +35,12 @@ class WebhookObjectsController extends Controller
     protected $objectFields = [
         'footage' => 'custom-64803', 'budget_volume' => 'custom-61758', 'budget_footage' => 'custom-61759'
     ];
+
+    /**
+     * @var string
+     */
+    protected $disabledCompaniesNameField = 'custom-65680';
+
     /**
      * @param Request $request
      * @return \Illuminate\View\View
@@ -74,33 +80,30 @@ class WebhookObjectsController extends Controller
         }
 
         $objectData['type'] = $request->get('type');
+        $objectData['disabledCompaniesName'] = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
 //        dd($objectData);
 //        $filter = [
-//            'q' => 'id > 10000',
+//            'q' => 'name = Компания 3',
 //        ];
 
         //Подбираем компании
         $companies = $methods->getCompanies();
 
-//        dd($companies);
-//
-//        if (!empty($companies)) {
-//            foreach ($companies as $company) {
-//                $orderData = $company['relationships']['orders']['data'];
-//
-//                if (empty($orderData)) {
-//                    continue;
-//                }
-//
-//                dd($orderData);
-//            }
-//        }
-
+        if (empty($companies)) {
+            return "Компании не найдены";
+        }
+        
         //Получаем контакты по компаниям
         $companyContacts = [];
         $companyData = [];
 
         foreach ($companies as $company) {
+            $filterResponse = $this->filterCompany($objectData, $company);
+
+            if (empty($filterResponse)) {
+                continue;
+            }
+
             $response = $handler->getContactByCompany($company, $companyContacts);
 
             if (!empty($response)) {
@@ -112,7 +115,7 @@ class WebhookObjectsController extends Controller
         }
 
         if (empty($companyContacts)) {
-            return null;
+            return "Контакты отсутствуют";
         }
 
         $contactData = [];
@@ -146,15 +149,59 @@ class WebhookObjectsController extends Controller
         $viewData = [
             'deal' => $objectResponse,
             'object' => $object,
-            'companyCount' => count($companyContacts),
+            'companyCount' => count($companyData),
         ];
 
         return view('objects.success', $viewData);
     }
 
+    /**
+     * @param array $objectData
+     * @param $company
+     */
     protected function filterCompany(array $objectData, $company)
     {
+        $attributes = $company['attributes'];
+        //Проверяем исключение по названию
+        if (in_array($attributes['name'], $objectData['disabledCompaniesName'])) {
+            return 0;
+        }
+//        dd($objectData);
+        foreach ($this->filterCustomsFields as $filterField) {
+            //Проверяем исключение по типу недвижимости
+            if (!empty($objectData['type'])) {
+                if (in_array($attributes['customs'][$filterField['type']], $objectData['type'])) {
+                    return 0;
+                }
+            }
 
+            //проверяем по площади
+            foreach (['footage','budget_volume','budget_footage'] as $key) {
+                $before = $attributes['customs'][$filterField[$key.'_before']];
+                $after = $attributes['customs'][$filterField[$key.'_before']];
+
+                if (
+                    !empty($before) && !empty($after))
+                {
+
+                    if ($key == 'budget_volume') {
+                        $before = $before * 1000;
+                        $after = $after * 1000;
+                    }
+
+                    if (
+                        $objectData[$key][0] <= $before &&
+                        $objectData[$key][1] >= $after
+                    ) {
+                        continue;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        }
+
+        return 1;
     }
 
     /**
