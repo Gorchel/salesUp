@@ -16,21 +16,56 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-10 offset-lg-1 form-group text-center">
-                    <label for="">По площади (кв/м)</label><br/>
-                    <b>oт %</b>&nbsp;<input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1">
+                        <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
+                    </div>
+                    <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b> %</b>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1">
+                        <label class="custom-control-label" for="customCheckTwo">Арендная ставка в месяц</label>
+                    </div>
+                    <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b> %</b>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1">
+                        <label class="custom-control-label" for="customCheckThree">Арендная ставка за кв. м в месяц</label>
+                    </div>
+                    <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b> %</b>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
-                    <label for="">Арендная ставка в месяц</label><br/>
-                    <b>oт %</b>&nbsp;<input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
+                    <label for="">Район</label><br/>
+                    <input type="text" class="form-control input-sm" name="district">
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
-                    <label for="">Арендная ставка за кв. м в месяц</label><br/>
-                    <b>oт %</b>&nbsp;<input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]"/>&nbsp;<b>до %</b>
+                    <label for="">Метро</label><br/>
+                    <input type="text" class="form-control input-sm" name="metro">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1">
+                    <div class="row">
+                        <div class="col-md-6 form-group text-center">
+                            <label for="">Улица</label><br/>
+                            <input type="text" class="form-control input-sm" name="street">
+                        </div>
+                        <div class="col-md-6 form-group text-center">
+                            <label for="">Дом</label><br/>
+                            <input type="text" class="form-control input-sm" name="house">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
