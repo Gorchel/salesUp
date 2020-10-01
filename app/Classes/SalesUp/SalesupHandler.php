@@ -76,8 +76,10 @@ class SalesupHandler
      * @param $company
      * @return array|mixed
      */
-    public function getContactByCompany($company, array &$outputContacts)
+    public function getContactByCompany($company, array &$outputContacts, $additionalData = [])
     {
+        $contactDistrictField = 'custom-65519';
+
         $companyRelations = $company['relationships'];
         $companyCompaniesRelations = $companyRelations['contacts'];
 
@@ -86,6 +88,32 @@ class SalesupHandler
         }
 
         foreach ($companyCompaniesRelations['data'] as $contacts) {
+            //Проверяем контакт
+            $contact = $this->methods->getContact($contacts['id']);
+
+            //Преобразуем массив
+            $filterDistricts = array_filter($contact['attributes']['customs'][$contactDistrictField], function($value) {
+               if (!empty($value)) {
+                   return 1;
+               }
+
+               return 0;
+            });
+
+            if (!empty($filterDistricts) && isset($additionalData['district'])) {
+                $districtChecker = 0;
+
+                foreach ($filterDistricts as $district) {
+                    if (strpos($additionalData['district'], $district) == true) {
+                        $districtChecker = 1;
+                    }
+                }
+
+                if (empty($districtChecker)) {
+                    return 0;
+                }
+            }
+
             $outputContacts[] = $contacts['id'];
         }
 

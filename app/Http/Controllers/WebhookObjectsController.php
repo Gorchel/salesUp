@@ -21,11 +21,37 @@ class WebhookObjectsController extends Controller
             'type' => 'custom-64185', 'footage_before' => 'custom-63697', 'footage_after' => 'custom-63698',
             'budget_volume_before' => 'custom-63699', 'budget_volume_after' => 'custom-63700',
             'budget_footage_before' => 'custom-63701', 'budget_footage_after' => 'custom-63702',
+            'district' => [
+                ['custom' => 'custom-65520', 'type' => 'array'],
+                ['custom' => 'custom-63707', 'type' => 'str']
+            ],
+            'metro' => [
+                ['custom' => 'custom-65524', 'type' => 'array'],
+                ['custom' => 'custom-64950', 'type' => 'str']
+            ],
+            'street' => [
+                ['custom' => 'custom-64954', 'type' => 'str'],
+                ['custom' => 'custom-64951', 'type' => 'str']
+            ],
+            'enabled_field' => 'custom-63697',
         ],
         [
             'type' => 'custom-64184', 'footage_before' => 'custom-64187', 'footage_after' => 'custom-64188',
             'budget_volume_before' => 'custom-64189', 'budget_volume_after' => 'custom-64190',
             'budget_footage_before' => 'custom-64191', 'budget_footage_after' => 'custom-64192',
+            'district' => [
+                ['custom' => 'custom-65521', 'type' => 'array'],
+                ['custom' => 'custom-65932', 'type' => 'str']
+            ],
+            'metro' => [
+                ['custom' => 'custom-65526', 'type' => 'array'],
+                ['custom' => 'custom-64197', 'type' => 'str']
+            ],
+            'street' => [
+                ['custom' => 'custom-65933', 'type' => 'str'],
+                ['custom' => 'custom-65823', 'type' => 'str']
+            ],
+            'enabled_field' => 'custom-64187',
         ],
     ];
 
@@ -40,6 +66,8 @@ class WebhookObjectsController extends Controller
      * @var string
      */
     protected $disabledCompaniesNameField = 'custom-65680';
+
+    protected $objectDistrictField = 'custom-64791';
 
     /**
      * @param Request $request
@@ -69,6 +97,7 @@ class WebhookObjectsController extends Controller
      */
     public function webhookEstateGet(Request $request)
     {
+
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
         $object = $methods->getObject($request->get('id'));
@@ -80,11 +109,12 @@ class WebhookObjectsController extends Controller
         }
 
         $objectData['type'] = $request->get('type');
-        $objectData['disabledCompaniesName'] = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
-//        dd($objectData);
-//        $filter = [
-//            'q' => 'name = Компания 3',
-//        ];
+
+        if (!empty($object['attributes']['customs'][$this->disabledCompaniesNameField])) {
+            $objectData['disabledCompaniesName'] = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
+        } else {
+            $objectData['disabledCompaniesName'] = [];
+        }
 
         //Подбираем компании
         $companies = $methods->getCompanies();
@@ -96,15 +126,18 @@ class WebhookObjectsController extends Controller
         //Получаем контакты по компаниям
         $companyContacts = [];
         $companyData = [];
+        $additionalContactData = [
+            'district' => $object['attributes']['customs'][$this->objectDistrictField],
+        ];
 
         foreach ($companies as $company) {
-            $filterResponse = $this->filterCompany($objectData, $company);
+            $filterResponse = $this->filterCompany($objectData, $request,  $company);
 
             if (empty($filterResponse)) {
                 continue;
             }
 
-            $response = $handler->getContactByCompany($company, $companyContacts);
+            $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
 
             if (!empty($response)) {
                 $companyData[] = [
@@ -113,6 +146,7 @@ class WebhookObjectsController extends Controller
                 ];
             }
         }
+
 
         if (empty($companyContacts)) {
             return "Контакты отсутствуют";
@@ -159,24 +193,37 @@ class WebhookObjectsController extends Controller
      * @param array $objectData
      * @param $company
      */
-    protected function filterCompany(array $objectData, $company)
+    protected function filterCompany(array $objectData, $request, $company)
     {
         $attributes = $company['attributes'];
+
         //Проверяем исключение по названию
-        if (in_array($attributes['name'], $objectData['disabledCompaniesName'])) {
+        if (count($objectData['disabledCompaniesName']) > 0 && in_array($attributes['name'], $objectData['disabledCompaniesName'])) {
             return 0;
         }
-//        dd($objectData);
+
+        $checkerArray = [];
+
         foreach ($this->filterCustomsFields as $filterField) {
+            $checker = 1;
+
+            if (empty($attributes['customs'][$filterField['enabled_field']])) {
+                continue;
+            }
+
             //Проверяем исключение по типу недвижимости
-            if (!empty($objectData['type'])) {
+            if (!empty($objectData['type']) && !empty($attributes['customs'][$filterField['type']])) {
                 if (in_array($attributes['customs'][$filterField['type']], $objectData['type'])) {
-                    return 0;
+                    $checker = 0;
                 }
             }
 
             //проверяем по площади
             foreach (['footage','budget_volume','budget_footage'] as $key) {
+                if (!$request->has($key.'_check')) {
+                    continue;
+                }
+
                 $before = $attributes['customs'][$filterField[$key.'_before']];
                 $after = $attributes['customs'][$filterField[$key.'_before']];
 
@@ -195,13 +242,50 @@ class WebhookObjectsController extends Controller
                     ) {
                         continue;
                     } else {
-                        return 0;
+                        $checker = 0;
                     }
                 }
             }
+
+            //Проверяем район/метро/дом/кв
+            foreach (['district','metro','street'] as $key) {
+                if (empty($request->get($key))) {
+                    continue;
+                }
+
+                $localChecker = 0;
+
+                foreach ($filterField[$key] as $customArray) {
+                    if (!isset($attributes['customs'][$customArray['custom']])) {
+                       continue;
+                    }
+
+                    $value = $attributes['customs'][$customArray['custom']];
+
+                    if ($customArray['type'] == 'array') {
+                        if (in_array($request->get($key), $value)) {
+                            $localChecker = 1;
+                        }
+                    } else {
+                        if (strpos($value, $request->get($key)) == true) {
+                            $localChecker = 1;
+                        }
+                    }
+                }
+
+                if (empty($localChecker)) {
+                    $checker = 0;
+                }
+            }
+
+            $checkerArray[] = $checker;
         }
 
-        return 1;
+        if (in_array(1, $checkerArray)) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     /**
