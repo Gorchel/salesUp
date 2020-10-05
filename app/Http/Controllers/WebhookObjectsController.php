@@ -299,8 +299,8 @@ class WebhookObjectsController extends Controller
         $percentArr = explode(',', $request->get($key));
 
         return [
-            $this->percent($value, $percentArr[0]),
-            $this->percent($value, $percentArr[1]),
+            $this->percent(intval($value), intval($percentArr[0])),
+            $this->percent(intval($value), intval($percentArr[1])),
         ];
     }
 
