@@ -225,31 +225,25 @@ class WebhookObjectsController extends Controller
                     continue;
                 }
 
-                $before = $attributes['customs'][$filterField[$key.'_before']];
-                $after = $attributes['customs'][$filterField[$key.'_before']];
+                $before = intval($attributes['customs'][$filterField[$key.'_before']]);
+                $after = intval($attributes['customs'][$filterField[$key.'_after']]);
 
-                if (
-                    !empty($before) && !empty($after))
-                {
+                if ($key == 'budget_volume') {
+                    $before = $before * 1000;
+                    $after = $after * 1000;
+                }
 
-                    if ($key == 'budget_volume') {
-                        $before = $before * 1000;
-                        $after = $after * 1000;
-                    }
+                $crossInterval = $this->crossingInterval($objectData[$key][0], $objectData[$key][1], $before, $after);
 
-                    if (
-                        $objectData[$key][0] >= $before &&
-                        $objectData[$key][1] <= $after
-                    ) {
-                        continue;
-                    } else {
-                        $checker = 0;
-                    }
+                if (!empty($crossInterval)) {
+                    continue;
+                } else {
+                    $checker = 0;
                 }
             }
 
 //            if ($checker == 1) {
-                dd($company);
+//                dd($company);
 //            }
 
             //Проверяем район/метро/дом/кв
@@ -307,6 +301,19 @@ class WebhookObjectsController extends Controller
             $this->percent(intval($value), intval($percentArr[0])),
             $this->percent(intval($value), intval($percentArr[1])),
         ];
+    }
+
+    public function crossingInterval($startInt, $finishInt, $startValue, $finishValue) {
+       if (
+            ($startValue >= $startInt && $startValue <= $finishInt) ||
+            ($finishValue <= $finishInt && $finishValue >= $startInt) ||
+            ($startValue <= $finishInt && $finishValue >= $startInt) ||
+            ($startValue >= $startInt && $finishValue <= $finishInt)
+       ) {
+           return 1;
+       }
+
+       return 0;
     }
 
     /**
