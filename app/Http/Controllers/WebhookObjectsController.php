@@ -147,6 +147,7 @@ class WebhookObjectsController extends Controller
             }
         }
 
+//        dd($companyContacts);
 
         if (empty($companyContacts)) {
             return "Контакты отсутствуют";
@@ -237,8 +238,8 @@ class WebhookObjectsController extends Controller
                     }
 
                     if (
-                        $objectData[$key][0] <= $before &&
-                        $objectData[$key][1] >= $after
+                        $objectData[$key][0] >= $before &&
+                        $objectData[$key][1] <= $after
                     ) {
                         continue;
                     } else {
@@ -246,6 +247,10 @@ class WebhookObjectsController extends Controller
                     }
                 }
             }
+
+//            if ($checker == 1) {
+//                dd($company);
+//            }
 
             //Проверяем район/метро/дом/кв
             foreach (['district','metro','street'] as $key) {
