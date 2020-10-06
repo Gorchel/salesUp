@@ -231,7 +231,7 @@ class WebhookObjectsController extends Controller
                     !empty($before) && !empty($after))
                 {
 
-                    if ($key == 'budget_volume') {
+                    if ($key == 'budget_footage') {
                         $before = $before * 1000;
                         $after = $after * 1000;
                     }
