@@ -232,7 +232,7 @@ class WebhookObjectsController extends Controller
                     !empty($before) && !empty($after))
                 {
 
-                    if ($key == 'budget_footage') {
+                    if ($key == 'budget_volume') {
                         $before = $before * 1000;
                         $after = $after * 1000;
                     }
@@ -249,7 +249,7 @@ class WebhookObjectsController extends Controller
             }
 
 //            if ($checker == 1) {
-//                dd($company);
+                dd($company);
 //            }
 
             //Проверяем район/метро/дом/кв
