@@ -55,6 +55,14 @@ class WebhookObjectsController extends Controller
         ],
     ];
 
+    protected $messages = [
+        'footage' => 'По площади (кв/м)',
+        'budget_volume' => 'Арендная ставка в месяц',
+        'budget_footage' => 'Арендная ставка за кв. м в месяц',
+        'district' => 'Район', 'metro' => 'Метро', 'street' => 'Улица',
+        'type' => 'По профилю компании',
+    ];
+
     /**
      * @var array
      */
@@ -68,6 +76,9 @@ class WebhookObjectsController extends Controller
      */
     protected $disabledCompaniesNameField = 'custom-65680';
 
+    /**
+     * @var string
+     */
     protected $objectDistrictField = 'custom-64791';
 
     /**
@@ -123,7 +134,8 @@ class WebhookObjectsController extends Controller
         $companies = $methods->getCompanies();
 
         if (empty($companies)) {
-            return "Компании не найдены";
+            $msg = "Компании не найдены";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
         }
 
         //Получаем контакты по компаниям
@@ -153,7 +165,8 @@ class WebhookObjectsController extends Controller
 //        dd($companyContacts);
 
         if (empty($companyContacts)) {
-            return "Контакты отсутствуют";
+            $msg = "Контакты отсутствуют";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
         }
 
         $contactData = [];
@@ -289,6 +302,38 @@ class WebhookObjectsController extends Controller
     }
 
     /**
+     * @param $request
+     */
+    protected function getErrors($request, $objectData)
+    {
+        $errors = [];
+
+        foreach (['footage','budget_volume','budget_footage'] as $key) {
+            if (!$request->has($key.'_check')) {
+                continue;
+            }
+
+            $errors[] = [
+                'name' => $this->messages[$key],
+                'text' => 'Диапазон: '.$objectData[$key][0].' - '.$objectData[$key][1],
+            ];
+        }
+
+        foreach (['district','metro','street'] as $key) {
+            if (empty($request->get($key))) {
+                continue;
+            }
+
+            $errors[] = [
+                'name' => $this->messages[$key],
+                'text' => $request->get($key),
+            ];
+        }
+
+        return $errors;
+    }
+
+    /**
      * @param $value
      * @param string $key
      * @param Request $request
@@ -304,6 +349,13 @@ class WebhookObjectsController extends Controller
         ];
     }
 
+    /**
+     * @param $startInt
+     * @param $finishInt
+     * @param $startValue
+     * @param $finishValue
+     * @return int
+     */
     public function crossingInterval($startInt, $finishInt, $startValue, $finishValue) {
        if (
             ($startValue >= $startInt && $startValue <= $finishInt) ||
