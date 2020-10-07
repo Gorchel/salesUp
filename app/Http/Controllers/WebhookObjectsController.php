@@ -59,7 +59,8 @@ class WebhookObjectsController extends Controller
      * @var array
      */
     protected $objectFields = [
-        'footage' => 'custom-64803', 'budget_volume' => 'custom-61758', 'budget_footage' => 'custom-61759'
+//        'footage' => 'custom-64803',
+        'budget_volume' => 'custom-61758', 'budget_footage' => 'custom-61759'
     ];
 
     /**
@@ -103,6 +104,8 @@ class WebhookObjectsController extends Controller
         $object = $methods->getObject($request->get('id'));
 
         $objectData = [];
+
+        $objectData['footage'] = $this->getArrayByPercent($object['attributes']['total-area'], 'footage', $request);;
 
         foreach ($this->objectFields as $key => $field) {
             $objectData[$key] = $this->getArrayByPercent($object['attributes']['customs'][$field], $key, $request);
@@ -219,6 +222,8 @@ class WebhookObjectsController extends Controller
                 }
             }
 
+//            dd($objectData);
+
             //проверяем по площади
             foreach (['footage','budget_volume','budget_footage'] as $key) {
                 if (!$request->has($key.'_check')) {
@@ -241,10 +246,6 @@ class WebhookObjectsController extends Controller
                     $checker = 0;
                 }
             }
-
-//            if ($checker == 1) {
-//                dd($company);
-//            }
 
             //Проверяем район/метро/дом/кв
             foreach (['district','metro','street'] as $key) {
