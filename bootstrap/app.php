@@ -94,6 +94,7 @@ $app->register(\App\Providers\LogServiceProvider::class);
 
 $app->configure('main');
 $app->configure('company_types');
+$app->configure('metro');
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',

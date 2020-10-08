@@ -25,10 +25,8 @@ class WebhookObjectsController extends Controller
                 ['custom' => 'custom-65520', 'type' => 'array'],
                 ['custom' => 'custom-63707', 'type' => 'str']
             ],
-            'metro' => [
-                ['custom' => 'custom-65524', 'type' => 'array'],
-                ['custom' => 'custom-64950', 'type' => 'str']
-            ],
+            'metro_1' => 'custom-66364',
+            'metro_2' => 'custom-65524',
             'street' => [
                 ['custom' => 'custom-64954', 'type' => 'str'],
                 ['custom' => 'custom-64951', 'type' => 'str']
@@ -43,10 +41,8 @@ class WebhookObjectsController extends Controller
                 ['custom' => 'custom-65521', 'type' => 'array'],
                 ['custom' => 'custom-65932', 'type' => 'str']
             ],
-            'metro' => [
-                ['custom' => 'custom-65526', 'type' => 'array'],
-                ['custom' => 'custom-64197', 'type' => 'str']
-            ],
+            'metro_1' => 'custom-66365',
+            'metro_2' => 'custom-65526',
             'street' => [
                 ['custom' => 'custom-65933', 'type' => 'str'],
                 ['custom' => 'custom-65823', 'type' => 'str']
@@ -55,6 +51,9 @@ class WebhookObjectsController extends Controller
         ],
     ];
 
+    /**
+     * @var array
+     */
     protected $messages = [
         'footage' => 'По площади (кв/м)',
         'budget_volume' => 'Арендная ставка в месяц',
@@ -93,10 +92,18 @@ class WebhookObjectsController extends Controller
         $token = $request->get('token');
         $type = $request->get('type');
 
+        $handler = new SalesupHandler($request->get('token'));
+        $methods = $handler->methods;
+        $object = $methods->getObject($id);
+
+        $address = $object['attributes']['address'];
+        $metroSelect = config('metro')[$this->checkCity($address)];
+
         $data = [
             'token' => $token,
             'id' => $id,
             'type' => $type,
+            'metroSelect' => $metroSelect,
             'objectTypes' => config('company_types'),
         ];
 
@@ -109,7 +116,6 @@ class WebhookObjectsController extends Controller
      */
     public function webhookEstateGet(Request $request)
     {
-
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
         $object = $methods->getObject($request->get('id'));
@@ -128,6 +134,21 @@ class WebhookObjectsController extends Controller
             $objectData['disabledCompaniesName'] = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
         } else {
             $objectData['disabledCompaniesName'] = [];
+        }
+
+        $objectData['address'] = $object['attributes']['address'];
+
+        if (
+            empty($request->get('type')) &&
+            empty($request->get('footage_check')) &&
+            empty($request->get('budget_volume_check')) &&
+            empty($request->get('budget_footage_check')) &&
+            empty($request->get('district')) &&
+            empty($request->get('metro')) &&
+            empty($request->get('street'))
+        ) {
+            $msg = "Выберите фильтр";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
         }
 
         //Подбираем компании
@@ -161,8 +182,6 @@ class WebhookObjectsController extends Controller
                 ];
             }
         }
-
-//        dd($companyContacts);
 
         if (empty($companyContacts)) {
             $msg = "Контакты отсутствуют";
@@ -235,8 +254,6 @@ class WebhookObjectsController extends Controller
                 }
             }
 
-//            dd($objectData);
-
             //проверяем по площади
             foreach (['footage','budget_volume','budget_footage'] as $key) {
                 if (!$request->has($key.'_check')) {
@@ -261,32 +278,48 @@ class WebhookObjectsController extends Controller
             }
 
             //Проверяем район/метро/дом/кв
-            foreach (['district','metro','street'] as $key) {
+            foreach (['district','street'] as $key) {
                 if (empty($request->get($key))) {
                     continue;
                 }
 
+                $keyArray = array_map('trim', explode(',',trim(mb_strtolower($request->get($key)))));
+
                 $localChecker = 0;
 
                 foreach ($filterField[$key] as $customArray) {
-                    if (!isset($attributes['customs'][$customArray['custom']])) {
+                    if (empty($attributes['customs'][$customArray['custom']])) {
                        continue;
                     }
 
                     $value = $attributes['customs'][$customArray['custom']];
 
-                    if ($customArray['type'] == 'array') {
-                        if (in_array($request->get($key), $value)) {
-                            $localChecker = 1;
-                        }
+                    if ($customArray['type'] != 'array') {
+                        $value = array_map('trim', explode(',',trim(mb_strtolower($value))));
                     } else {
-                        if (strpos($value, $request->get($key)) == true) {
-                            $localChecker = 1;
+                        $value = array_map('mb_strtolower', $value);
+                    }
+
+                    foreach ($value as $valueEl) {
+                        foreach ($keyArray as $keyEl) {
+                            if (strpos($valueEl, $keyEl) !== false) {
+                                $localChecker = 1;
+                            }
                         }
                     }
                 }
 
                 if (empty($localChecker)) {
+                    $checker = 0;
+                }
+            }
+
+            //Метро
+            if (!empty($request->get('metro'))) {
+                $metroSelectId = $this->checkCity($objectData['address']);
+                $metroValue = $attributes['customs'][$filterField['metro_'.$metroSelectId]];
+
+                if (empty($metroValue) || empty(array_intersect($metroValue, $request->get('metro')))) {
                     $checker = 0;
                 }
             }
@@ -319,7 +352,7 @@ class WebhookObjectsController extends Controller
             ];
         }
 
-        foreach (['district','metro','street'] as $key) {
+        foreach (['district','street'] as $key) {
             if (empty($request->get($key))) {
                 continue;
             }
@@ -327,6 +360,13 @@ class WebhookObjectsController extends Controller
             $errors[] = [
                 'name' => $this->messages[$key],
                 'text' => $request->get($key),
+            ];
+        }
+
+        if (!empty($request->get('metro'))) {
+            $errors[] = [
+                'name' => $this->messages['metro'],
+                'text' => implode(',',$request->get($key)),
             ];
         }
 
@@ -378,5 +418,17 @@ class WebhookObjectsController extends Controller
         $numberPercent = ($number / 100) * $percent;
 
         return intval($number + $numberPercent);
+    }
+
+    /**
+     * @param $address
+     * @return int
+     */
+    protected function checkCity($address)
+    {
+        if (strpos($address,'Петербург') == true) {
+            return 2;
+        }
+        return 1;
     }
 }

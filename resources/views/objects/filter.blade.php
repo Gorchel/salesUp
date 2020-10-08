@@ -10,7 +10,7 @@
                     <label for="">По профилю компании</label><br/>
                     <select name="type[]" id="type" class="form-control" multiple="multiple">
                         @foreach ($objectTypes as $key => $value)
-                            <option value="{{$key}}">{{$value}}</option>
+                            <option value="{{$value}}">{{$value}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -49,10 +49,12 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-10 offset-lg-1 form-group text-center">
+                <select name="metro[]" id="metro" class="form-control" multiple="multiple">
                     <label for="">Метро</label><br/>
-                    <input type="text" class="form-control input-sm" name="metro">
-                </div>
+                    @foreach ($metroSelect as $key => $value)
+                        <option value="{{$value}}">{{$value}}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
@@ -79,7 +81,12 @@
             var footageSlider = new Slider('#footage', {});
             var budgetVolumeSlider = new Slider('#budget_volume', {});
             var budgetFootageSlider = new Slider('#budget_footage', {});
-            $('#type').select2();
+            $('#type').select2({
+                closeOnSelect: false
+            });
+            $('#metro').select2({
+                closeOnSelect: false
+            });
         });
     </script>
 @overwrite
