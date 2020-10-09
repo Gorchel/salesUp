@@ -31,7 +31,7 @@ class WebhookObjectsController extends Controller
                 ['custom' => 'custom-64954', 'type' => 'str'],
                 ['custom' => 'custom-64951', 'type' => 'str']
             ],
-            'enabled_field' => 'custom-63697',
+            'enabled_field' => 'custom-63697', 'brand' => 'custom-63694',
         ],
         [
             'type' => 'custom-64184', 'footage_before' => 'custom-64187', 'footage_after' => 'custom-64188',
@@ -47,7 +47,7 @@ class WebhookObjectsController extends Controller
                 ['custom' => 'custom-65933', 'type' => 'str'],
                 ['custom' => 'custom-65823', 'type' => 'str']
             ],
-            'enabled_field' => 'custom-64187',
+            'enabled_field' => 'custom-64187', 'brand' => 'custom-64183',
         ],
     ];
 
@@ -99,12 +99,18 @@ class WebhookObjectsController extends Controller
         $address = $object['attributes']['address'];
         $metroSelect = config('metro')[$this->checkCity($address)];
 
+        $disabledCompanies = strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]);
+        $metro = trim(mb_strtolower($object['attributes']['subway-name']));
+
         $data = [
             'token' => $token,
             'id' => $id,
             'type' => $type,
             'metroSelect' => $metroSelect,
             'objectTypes' => config('company_types'),
+            'attributes' => $object['attributes'],
+            'disabledCompanies' => $disabledCompanies,
+            'metro' => $metro,
         ];
 
         return view('objects.filter', $data);
@@ -168,7 +174,7 @@ class WebhookObjectsController extends Controller
 
         foreach ($companies as $company) {
             $filterResponse = $this->filterCompany($objectData, $request,  $company);
-
+        dd($filterResponse);
             if (empty($filterResponse)) {
                 continue;
             }
@@ -233,11 +239,6 @@ class WebhookObjectsController extends Controller
     {
         $attributes = $company['attributes'];
 
-        //Проверяем исключение по названию
-        if (count($objectData['disabledCompaniesName']) > 0 && in_array($attributes['name'], $objectData['disabledCompaniesName'])) {
-            return 0;
-        }
-
         $checkerArray = [];
 
         foreach ($this->filterCustomsFields as $filterField) {
@@ -247,8 +248,20 @@ class WebhookObjectsController extends Controller
                 continue;
             }
 
+            //Не предлагать компаниям
+            if ($request->has('disabled_company_check') && !empty($request->get('disabled_company'))) {
+                $disabledCompanyArray = array_map('trim', explode(',',trim(mb_strtolower($request->get('disabled_company')))));
+                $brandField = trim(mb_strtolower($attributes['customs'][$filterField['brand']]));
+
+                foreach ($disabledCompanyArray as $disabledCompany) {
+                    if (strpos($brandField, $disabledCompany) !== false) {
+                        $checker = 0;
+                    }
+                }
+            }
+
             //Проверяем исключение по типу недвижимости
-            if (!empty($objectData['type']) && !empty($attributes['customs'][$filterField['type']])) {
+            if ($request->has('type_check') && !empty($objectData['type']) && !empty($attributes['customs'][$filterField['type']])) {
                 if (in_array($attributes['customs'][$filterField['type']], $objectData['type'])) {
                     $checker = 0;
                 }
@@ -279,6 +292,10 @@ class WebhookObjectsController extends Controller
 
             //Проверяем район/метро/дом/кв
             foreach (['district','street'] as $key) {
+                if (!$request->has($key.'_check')) {
+                    continue;
+                }
+
                 if (empty($request->get($key))) {
                     continue;
                 }
@@ -315,7 +332,7 @@ class WebhookObjectsController extends Controller
             }
 
             //Метро
-            if (!empty($request->get('metro'))) {
+            if ($request->has('metro_check') && !empty($request->get('metro'))) {
                 $metroSelectId = $this->checkCity($objectData['address']);
                 $metroValue = $attributes['customs'][$filterField['metro_'.$metroSelectId]];
 
