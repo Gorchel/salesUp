@@ -108,9 +108,9 @@ class WebhookObjectsController extends Controller
         $addressArray = explode(',', str_replace('пр-кт','', $address));
         $addressArray = array_map('trim', $addressArray);
 
-        if (count($addressArray == 3)) {
+        if (count($addressArray) == 3) {
             $address = $addressArray[1].' '.$addressArray[2];
-        } else if (count($addressArray == 4)) {
+        } else if (count($addressArray) == 4) {
             $address = $addressArray[2].' '.$addressArray[3];
         } else {
             $address = implode(' ', $addressArray);
