@@ -102,6 +102,11 @@ class WebhookObjectsController extends Controller
         $disabledCompanies = strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]);
         $metro = trim(mb_strtolower($object['attributes']['subway-name']));
 
+        $districtArray = explode(',', str_replace('рaйон','', $object['attributes']['district']));
+        $districtArray = array_map('trim', $districtArray);
+//
+//        $address = str_replace(',','', $object['attributes']['district']);
+
         $data = [
             'token' => $token,
             'id' => $id,
@@ -111,6 +116,8 @@ class WebhookObjectsController extends Controller
             'attributes' => $object['attributes'],
             'disabledCompanies' => $disabledCompanies,
             'metro' => $metro,
+            'districtArray' => $districtArray,
+            'address' => $address,
         ];
 
         return view('objects.filter', $data);

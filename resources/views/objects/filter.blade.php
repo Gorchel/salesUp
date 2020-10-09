@@ -11,7 +11,7 @@
                         <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1" checked="checked">
                         <label class="custom-control-label" for="streetCheck">Улица, Дом</label>
                     </div>
-                    <input type="text" class="form-control input-sm" name="street" value="{{$attributes['address']}}">
+                    <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
                 </div>
             </div>
             <div class="row">
@@ -33,7 +33,7 @@
                         <input type="checkbox" class="custom-control-input" id="districtCheck" name="district_check" value="1" checked="checked">
                         <label class="custom-control-label" for="districtCheck">Район</label>
                     </div>
-                    <input type="text" class="form-control input-sm" name="district" value="{{$attributes['district']}}">
+                    <input type="text" class="form-control input-sm" name="district" value="{{isset($districtArray[0]) ? $districtArray[0] : ''}}">
                 </div>
             </div>
             <div class="row">
