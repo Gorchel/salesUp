@@ -204,6 +204,26 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param int $objectId
+     */
+    public function getDealStages()
+    {
+        $path = 'deal-stage-categories';
+
+        $data = [
+//            'include' => 'deals',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getObject.');
+
+        return $response['data'];
+    }
+
     public function attachDealToObject(int $dealId, int $objectId) {
         $path = 'estate-properties/'.$objectId;
 

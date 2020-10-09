@@ -220,6 +220,10 @@ class WebhookObjectsController extends Controller
                 'companies' => [
                     'data' => $companyData,
                 ],
+                'stage-category' => [
+                    'type' => 'stage-category',
+                    'id' => 32315
+                ],
             ],
         ];
 
@@ -388,7 +392,7 @@ class WebhookObjectsController extends Controller
         if (!empty($request->get('metro'))) {
             $errors[] = [
                 'name' => $this->messages['metro'],
-                'text' => implode(',',$request->get($key)),
+                'text' => implode(',',$request->get('metro')),
             ];
         }
 
