@@ -105,6 +105,17 @@ class WebhookObjectsController extends Controller
         $districtArray = explode(',', str_replace('район','', $object['attributes']['district']));
         $districtArray = array_map('trim', $districtArray);
 
+        $addressArray = explode(',', str_replace('пр-кт','', $address));
+        $addressArray = array_map('trim', $addressArray);
+
+        if (count($addressArray == 3)) {
+            $address = $addressArray[1].' '.$addressArray[2];
+        } else if (count($addressArray == 4)) {
+            $address = $addressArray[2].' '.$addressArray[3];
+        } else {
+            $address = implode(' ', $addressArray);
+        }
+
         $data = [
             'token' => $token,
             'id' => $id,
