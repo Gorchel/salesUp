@@ -83,7 +83,7 @@ class WebhookObjectsController extends Controller
     /**
      * @var string
      */
-    protected $objectProfileOfCompany = 'custom-61771';
+    protected $objectProfileOfCompany = 'custom-61774';
 
     /**
      * @param Request $request
