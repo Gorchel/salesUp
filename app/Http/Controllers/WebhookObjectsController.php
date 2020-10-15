@@ -104,8 +104,8 @@ class WebhookObjectsController extends Controller
         $address = $object['attributes']['address'];
         $metroSelect = config('metro')[$this->checkCity($address)];
 
-        $disabledCompanies = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
-        $disabledCompanies = implode(',',array_map('trim', $disabledCompanies));
+        $disabledCompanies = strip_tags(str_replace('&nbsp;','',$object['attributes']['customs'][$this->disabledCompaniesNameField]));
+//        $disabledCompanies = implode(',',array_map('trim', $disabledCompanies));
 
         $metro = trim(mb_strtolower($object['attributes']['subway-name']));
 
