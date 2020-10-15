@@ -81,6 +81,11 @@ class WebhookObjectsController extends Controller
     protected $objectDistrictField = 'custom-64791';
 
     /**
+     * @var string
+     */
+    protected $objectProfileOfCompany = 'custom-61771';
+
+    /**
      * @param Request $request
      * @return \Illuminate\View\View
      */
@@ -100,6 +105,8 @@ class WebhookObjectsController extends Controller
         $metroSelect = config('metro')[$this->checkCity($address)];
 
         $disabledCompanies = strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]);
+        $disabledCompanies = array_map('trim', $disabledCompanies);
+
         $metro = trim(mb_strtolower($object['attributes']['subway-name']));
 
         $districtArray = explode(',', str_replace('район','', $object['attributes']['district']));
@@ -116,6 +123,8 @@ class WebhookObjectsController extends Controller
             $address = implode(' ', $addressArray);
         }
 
+        $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];
+
         $data = [
             'token' => $token,
             'id' => $id,
@@ -127,6 +136,7 @@ class WebhookObjectsController extends Controller
             'metro' => $metro,
             'districtArray' => $districtArray,
             'address' => $address,
+            'profileCompanies' => $profileCompanies,
         ];
 
         return view('objects.filter', $data);

@@ -22,7 +22,7 @@
                     </div>
                     <select name="type[]" id="type" class="form-control" multiple="multiple">
                         @foreach ($objectTypes as $key => $value)
-                            <option value="{{$value}}">{{$value}}</option>
+                            <option value="{{$value}}" {{in_array($value, $profileCompanies) ? 'selected="selected"' : ''}}>{{$value}}</option>
                         @endforeach
                     </select>
                 </div>
