@@ -284,6 +284,10 @@ class WebhookObjectsController extends Controller
                 $brandField = trim(mb_strtolower($attributes['customs'][$filterField['brand']]));
 
                 foreach ($disabledCompanyArray as $disabledCompany) {
+                    if (empty($disabledCompany)) {
+                        continue;
+                    }
+
                     if (strpos($brandField, $disabledCompany) !== false) {
                         $checker = 0;
                     }
@@ -349,6 +353,10 @@ class WebhookObjectsController extends Controller
 
                     foreach ($value as $valueEl) {
                         foreach ($keyArray as $keyEl) {
+                            if (empty($keyEl)) {
+                                continue;
+                            }
+
                             if (strpos($valueEl, $keyEl) !== false) {
                                 $localChecker = 1;
                             }
