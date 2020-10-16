@@ -125,6 +125,14 @@ class WebhookObjectsController extends Controller
 
         $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];
 
+        $objectSlider = [];
+
+        foreach ($this->objectFields as $key => $field) {
+            $objectSlider[$key] = $object['attributes']['customs'][$field];
+        }
+
+        $objectSlider['footage'] = $object['attributes']['total-area'];
+
         $data = [
             'token' => $token,
             'id' => $id,
@@ -137,6 +145,7 @@ class WebhookObjectsController extends Controller
             'districtArray' => $districtArray,
             'address' => $address,
             'profileCompanies' => $profileCompanies,
+            'objectSlider' => $objectSlider
         ];
 
         return view('objects.filter', $data);

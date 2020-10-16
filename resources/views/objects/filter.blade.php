@@ -1,7 +1,7 @@
 @extends('layouts')
 
 @section("content")
-        <form action="/weebhook_estate_get">
+        <form action="/weebhook_estate_get" id="submitForm">
             <div class="row" style="margin-bottom: 40px;"></div>
             <input type="hidden" name="token" value="{{$token}}">
             <input type="hidden" name="id" value="{{$id}}">
@@ -51,29 +51,80 @@
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1" checked="checked">
+                                <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
+                            </div>
+                            <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" name="footage_value_input" value="{{intval($objectSlider['footage'])}}" readonly="readonly">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="0">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="customCheckTwo">Арендная ставка в месяц</label>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
+                                <label class="custom-control-label" for="customCheckTwo">Арендная ставка в месяц</label>
+                            </div>
+                            <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" name="budget_volume_value_input" value="{{intval($objectSlider['budget_volume'])}}" readonly="readonly">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="0">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="customCheckThree">Арендная ставка за кв. м в месяц</label>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
+                                <label class="custom-control-label" for="customCheckThree">Арендная ставка за кв. м в месяц</label>
+                            </div>
+                            <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" name="budget_footage_value_input" value="{{intval($objectSlider['budget_footage'])}}" readonly="readonly">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="0">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             </div>
             <div class="row">
@@ -87,7 +138,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
-                    <input type="submit" class="btn btn-success" value="Создать сделку">
+                    <input type="submit" class="btn btn-success" id="submit" value="Создать сделку">
                 </div>
             </div>
         </form>
@@ -101,16 +152,68 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            var footageSlider = new Slider('#footage', {});
-            var budgetVolumeSlider = new Slider('#budget_volume', {});
-            var budgetFootageSlider = new Slider('#budget_footage', {});
+            var footageSlider = new Slider('#footage', {}).on('change', function (ev) {
+                updateSliderInput('footage', ev.newValue);
+            });
+
+            var budgetVolumeSlider = new Slider('#budget_volume', {}).on('change', function (ev) {
+                updateSliderInput('budget_volume', ev.newValue);
+            });
+            var budgetFootageSlider = new Slider('#budget_footage', {}).on('change', function (ev) {
+                updateSliderInput('budget_footage', ev.newValue);
+            });
+
             $('#type').select2({
                 closeOnSelect: false
             });
+
             $('#metro').select2({
                 closeOnSelect: false
             });
+
+            updateSliderInput('footage',footageSlider.getValue());
+            updateSliderInput('budget_volume',budgetVolumeSlider.getValue());
+            updateSliderInput('budget_footage',budgetFootageSlider.getValue());
+
+            $('body').on('change','.change_value', function() {
+               var key = $(this).data('key'),
+                   startVal = parseInt($('input[name="' + key + '_start_input"]').val()),
+                   realVal = parseInt($('input[name="' + key + '_value_input"]').val()),
+                   finishVal = parseInt($('input[name="' + key + '_finish_input"]').val());
+
+               if (key === 'footage') {
+                   footageSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
+               } else if (key === 'budget_volume') {
+                   budgetVolumeSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
+               } else {
+                   budgetFootageSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
+               }
+            });
+
+            $("input[type=text]").keydown(function(event){
+                if(event.keyCode == 13){
+                    event.preventDefault();
+                    return false;
+                }
+            });
         });
+
+        function updateSlider(realVal, value)
+        {
+            return ((value - realVal) / realVal) * 100;
+        }
+
+        function updateSliderInput(key, valueArr)
+        {
+            var value = parseInt($('input[name="' + key + '_value_input"]').val());
+
+            $('input[name="' + key + '_start_input"]').val(getPercent(value, valueArr[0]));
+            $('input[name="' + key + '_finish_input"]').val(getPercent(value, valueArr[1]));
+        }
+
+        function getPercent(value, percent) {
+            return value + parseInt((value / 100) * parseInt(percent));
+        }
     </script>
 @overwrite
 
