@@ -65,7 +65,7 @@
                                     <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="0">
                                 </div>
                                 <div class="col-4">
-                                    <input type="text" class="form-control" name="footage_value_input" value="{{intval($objectSlider['footage'])}}" readonly="readonly">
+                                    <input type="text" class="form-control" name="footage_value_input" data-value="{{intval($objectSlider['footage'])}}" value="{{number_format(intval($objectSlider['footage']),0,' ',' ')}}" readonly="readonly">
                                 </div>
                                 <div class="col-4">
                                     <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="0">
@@ -91,7 +91,7 @@
                                     <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="0">
                                 </div>
                                 <div class="col-4">
-                                    <input type="text" class="form-control" name="budget_volume_value_input" value="{{intval($objectSlider['budget_volume'])}}" readonly="readonly">
+                                    <input type="text" class="form-control" name="budget_volume_value_input" data-value="{{intval($objectSlider['budget_volume'])}}" value="{{number_format(intval($objectSlider['budget_volume']),0,' ',' ')}}" readonly="readonly">
                                 </div>
                                 <div class="col-4">
                                     <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="0">
@@ -117,7 +117,7 @@
                                     <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="0">
                                 </div>
                                 <div class="col-4">
-                                    <input type="text" class="form-control" name="budget_footage_value_input" value="{{intval($objectSlider['budget_footage'])}}" readonly="readonly">
+                                    <input type="text" class="form-control" name="budget_footage_value_input" data-value="{{intval($objectSlider['budget_footage'])}}" value="{{number_format(intval($objectSlider['budget_footage']),0,' ',' ')}}" readonly="readonly">
                                 </div>
                                 <div class="col-4">
                                     <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="0">
@@ -150,6 +150,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js" integrity="sha512-f0VlzJbcEB6KiW8ZVtL+5HWPDyW1+nJEjguZ5IVnSQkvZbwBt2RfCBY0CBO1PsMAqxxrG4Di6TfsCPP3ZRwKpA==" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+
     <script>
         $(document).ready(function() {
             var footageSlider = new Slider('#footage', {}).on('change', function (ev) {
@@ -177,9 +178,9 @@
 
             $('body').on('change','.change_value', function() {
                var key = $(this).data('key'),
-                   startVal = parseInt($('input[name="' + key + '_start_input"]').val()),
-                   realVal = parseInt($('input[name="' + key + '_value_input"]').val()),
-                   finishVal = parseInt($('input[name="' + key + '_finish_input"]').val());
+                   startVal = parseInt($('input[name="' + key + '_start_input"]').data('value')),
+                   realVal = parseInt($('input[name="' + key + '_value_input"]').data('value')),
+                   finishVal = parseInt($('input[name="' + key + '_finish_input"]').data('value'));
 
                if (key === 'footage') {
                    footageSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
@@ -205,14 +206,18 @@
 
         function updateSliderInput(key, valueArr)
         {
-            var value = parseInt($('input[name="' + key + '_value_input"]').val());
+            var value = parseInt($('input[name="' + key + '_value_input"]').data('value'));
 
-            $('input[name="' + key + '_start_input"]').val(getPercent(value, valueArr[0]));
-            $('input[name="' + key + '_finish_input"]').val(getPercent(value, valueArr[1]));
+            $('input[name="' + key + '_start_input"]').val(numberWithSpaces(getPercent(value, valueArr[0])));
+            $('input[name="' + key + '_finish_input"]').val(numberWithSpaces(getPercent(value, valueArr[1])));
         }
 
         function getPercent(value, percent) {
             return value + parseInt((value / 100) * parseInt(percent));
+        }
+
+        function numberWithSpaces(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
     </script>
 @overwrite
