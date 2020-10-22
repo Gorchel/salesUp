@@ -127,6 +127,7 @@ class WebhookController extends Controller
      */
     public function copyContactsView(Request $request)
     {
+        Log::info(json_encode($request->all()));
         return view('/contacts/copy');
     }
 }
