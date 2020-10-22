@@ -24,3 +24,5 @@ $router->post('/webhook_objects', ['uses' => 'WebhookController@webhookPostObjec
 $router->get('/webhook_deals_objects', ['uses' => 'WebhookObjectsController@webhookUpdateObjectsContacts']);
 $router->get('/weebhook_estate_filter', ['uses' => 'WebhookObjectsController@webhookEstateFilter']);
 $router->get('/weebhook_estate_get', ['uses' => 'WebhookObjectsController@webhookEstateGet']);
+
+$router->get('/copy', ['uses' => 'WebhookController@copyContactsView']);

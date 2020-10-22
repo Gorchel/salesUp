@@ -120,4 +120,13 @@ class WebhookController extends Controller
 
         return redirect('/webhook_objects');
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function copyContactsView(Request $request)
+    {
+        return view('/contacts/copy');
+    }
 }
