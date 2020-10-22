@@ -128,6 +128,33 @@ class WebhookController extends Controller
     public function copyContactsView(Request $request)
     {
         Log::info(json_encode($request->all()));
-        return view('/contacts/copy');
+
+        $id = $request->get('ids')[0];
+        $token = $request->get('token');
+
+        $salesupHandler = new SalesupHandler($token);
+        $deal = $salesupHandler->methods->getDeal($id);
+
+        $contactEmails = [];
+
+        if (!empty($deal)) {
+            $contactsData = $deal['relationships']['contacts']['data'];
+
+            if (!empty($contactsData)) {
+                foreach ($contactsData as $data) {
+                    $contact = $salesupHandler->methods->getContact($data['id']);
+
+                    if (isset($contact['attributes']) && !empty($contact['attributes']['email'])) {
+                        $contactEmails[] = $contact['attributes']['email'];
+                    }
+                }
+            }
+        }
+
+        $data = [
+            'contactEmails' => $contactEmails,
+        ];
+
+        return view('/contacts/copy', $data);
     }
 }

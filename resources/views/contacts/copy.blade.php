@@ -4,11 +4,17 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-12 text-center" style="margin-top: 20px;">
-            <!-- Target -->
-            <input id="foo" value="https://github.com/zenorocha/clipboard.js.git" class="form-control">
-            <hr/>
-            <!-- Trigger -->
-            <button class="btn btn-info" id="copy-contacts" data-clipboard-target="#foo">Скопировать</button>
+            @if(!empty($contactEmails))
+                <!-- Target -->
+                    <textarea id="foo" class="form-control" rows="10">
+                        {{implode(',',$contactEmails)}}
+                    </textarea>
+                <hr/>
+                <!-- Trigger -->
+                <button class="btn btn-info" id="copy-contacts" data-clipboard-target="#foo">Скопировать</button>
+            @else
+                <h1 class="text-center">В контактах сделки отсутствуют email!</h1>
+            @endif
         </div>
     </div>
 </div>
@@ -39,3 +45,4 @@
 @section('css')
     @parent
 @overwrite
+
