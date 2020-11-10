@@ -26,7 +26,3 @@ $router->get('/weebhook_estate_filter', ['uses' => 'WebhookObjectsController@web
 $router->get('/weebhook_estate_get', ['uses' => 'WebhookObjectsController@webhookEstateGet']);
 
 $router->get('/copy', ['uses' => 'WebhookController@copyContactsView']);
-
-$router->get('/metro', function () use ($router) {
-    return json_encode(config('metro_outher',\JSON_UNESCAPED_UNICODE));
-});
