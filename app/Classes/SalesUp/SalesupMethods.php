@@ -54,7 +54,7 @@ class SalesupMethods
         $path = 'orders';
 
         $data = [
-//            'include' => 'companies,contacts',
+            'include' => 'companies,contacts',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
@@ -174,6 +174,23 @@ class SalesupMethods
         $path = 'contacts/'.$contactId;
 
         $data = [];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getDeals.');
+
+        return $response['data'];
+    }
+
+    public function getContacts(array $filters = [])
+    {
+        $path = 'contacts';
+
+        $data = [
+            'filter' => $filters
+        ];
 
         $jsonResponse = $this->getRequest($path, $data);
 

@@ -9,7 +9,7 @@
             <b>Объект недвижимости: </b><span>{{$object['attributes']['name']}}</span>
         </div>
         <div class="col-lg-12">
-            <b>Найдено: </b><span>{{$companyCount}} компаний</span>
+            <b>Найдено: </b><span>{{$ordersCount}} заявок</span>
         </div>
     </div>
     @parent

@@ -7,6 +7,27 @@
             <input type="hidden" name="id" value="{{$id}}">
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
+                    <select name="object_type" id="object_type" class="form-control">
+                        <option value="1">Сниму/Сдам</option>
+                        <option value="2">Куплю/Продам</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1" checked="checked">
+                        <label class="custom-control-label" for="type_of_property_check">По типу недвижимости</label>
+                    </div>
+                    <select name="type_of_property[]" id="type_of_property" class="form-control" multiple="multiple">
+                        @foreach ($typeOfProperties as $key => $value)
+                            <option value="{{$value}}" {{in_array($value, $typeOfPropertyObj) ? 'selected="selected"' : ''}}>{{$value}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="row change_obg_type" data-type="1">
+                <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1" checked="checked">
                         <label class="custom-control-label" for="streetCheck">Улица, Дом</label>
@@ -14,16 +35,28 @@
                     <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
                 </div>
             </div>
-            <div class="row">
+            <div class="row change_obg_type" data-type="1">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="typeCheck" name="type_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="typeCheck">По профилю компании</label>
+                        <input type="checkbox" class="custom-control-input" id="type_of_activity_check" name="type_of_activity_check" value="1" checked="checked">
+                        <label class="custom-control-label" for="type_of_activity_check">По Виду деятельности</label>
                     </div>
-                    <select name="type[]" id="type" class="form-control" multiple="multiple">
+                    <select name="type_of_activity[]" id="type_of_activity" class="form-control" multiple="multiple">
                         @foreach ($objectTypes as $key => $value)
                             <option value="{{$value}}" {{in_array($value, $profileCompanies) ? 'selected="selected"' : ''}}>{{$value}}</option>
                         @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="row change_obg_type" data-type="1">
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="address_program_check" name="address_program_check" value="1" checked="checked">
+                        <label class="custom-control-label" for="address_program_check">Есть ли адрессная программа?</label>
+                    </div>
+                    <select name="address_program" id="address_program" class="form-control">
+                        <option value="Да">Да</option>
+                        <option value="Нет">Нет</option>
                     </select>
                 </div>
             </div>
@@ -81,7 +114,7 @@
                         <div class="col-lg-12">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="customCheckTwo">Арендная ставка в месяц</label>
+                                <label class="custom-control-label" for="customCheckTwo">По бюджету, руб.мес</label>
                             </div>
                             <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                         </div>
@@ -101,13 +134,13 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row change_obg_type" data-type="1">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="customCheckThree">Арендная ставка за кв. м в месяц</label>
+                                <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
                             </div>
                             <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                         </div>
@@ -127,13 +160,52 @@
                     </div>
                 </div>
             </div>
+{{--            <div class="row">--}}
+{{--                <div class="col-lg-10 offset-lg-1 form-group">--}}
+{{--                    <div class="custom-control custom-checkbox">--}}
+{{--                        <input type="checkbox" class="custom-control-input" id="notCompanyCheck" name="disabled_company_check" value="1" checked="checked">--}}
+{{--                        <label class="custom-control-label" for="notCompanyCheck">Не предлагать компаниям</label>--}}
+{{--                    </div>--}}
+{{--                    <input type="text" class="form-control input-sm" name="disabled_company" value="{{$disabledCompanies}}">--}}
+{{--                </div>--}}
+{{--            </div>--}}
+
+            <div class="row change_obg_type" data-type="2">
+                <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1" checked="checked">
+                                <label class="custom-control-label" for="payback_period_check">Предполагаемый срок окупаемости в мес</label>
+                            </div>
+                            <input id="payback_period" name="payback_period" type="text" class="btm-color" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[12,24]" style="width: 80%;"/>&nbsp;<b>&nbsp;мес.</b>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_start_input" value="0">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control" name="payback_period_value_input" data-value="16" value="16" readonly="readonly">
+                                </div>
+                                <div class="col-4">
+                                    <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_finish_input" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="notCompanyCheck" name="disabled_company_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="notCompanyCheck">Не предлагать компаниям</label>
+                        <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1" checked="checked">
+                        <label class="custom-control-label" for="client_type_check">Клиент</label>
                     </div>
-                    <input type="text" class="form-control input-sm" name="disabled_company" value="{{$disabledCompanies}}">
+                    <select name="client_type" id="client_type" class="form-control">
+                        <option value="1">cетевой</option>
+                        <option value="2">не сетевой</option>
+                    </select>
                 </div>
             </div>
             <div class="row">
@@ -153,6 +225,8 @@
 
     <script>
         $(document).ready(function() {
+            changeObjType();
+
             var footageSlider = new Slider('#footage', {}).on('change', function (ev) {
                 updateSliderInput('footage', ev.newValue);
             });
@@ -164,7 +238,15 @@
                 updateSliderInput('budget_footage', ev.newValue);
             });
 
-            $('#type').select2({
+            var paybackPeriodSlider = new Slider('#payback_period', {}).on('change', function (ev) {
+                updateSliderInputWithoutPercent('payback_period', ev.newValue);
+            });
+
+            $('#type_of_activity').select2({
+                closeOnSelect: false
+            });
+
+            $('#type_of_property').select2({
                 closeOnSelect: false
             });
 
@@ -175,19 +257,22 @@
             updateSliderInput('footage',footageSlider.getValue());
             updateSliderInput('budget_volume',budgetVolumeSlider.getValue());
             updateSliderInput('budget_footage',budgetFootageSlider.getValue());
+            updateSliderInputWithoutPercent('payback_period',paybackPeriodSlider.getValue());
 
             $('body').on('change','.change_value', function() {
                var key = $(this).data('key'),
-                   startVal = parseInt($('input[name="' + key + '_start_input"]').data('value')),
+                   startVal = parseInt($('input[name="' + key + '_start_input"]').val().split(' ').join('')),
                    realVal = parseInt($('input[name="' + key + '_value_input"]').data('value')),
-                   finishVal = parseInt($('input[name="' + key + '_finish_input"]').data('value'));
+                   finishVal = parseInt($('input[name="' + key + '_finish_input"]').val().split(' ').join(''));
 
                if (key === 'footage') {
                    footageSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
                } else if (key === 'budget_volume') {
                    budgetVolumeSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
-               } else {
+               } else if (key === 'budget_footage') {
                    budgetFootageSlider.setValue([updateSlider(realVal, startVal), updateSlider(realVal, finishVal)]);
+               } else {
+                   paybackPeriodSlider.setValue([updateSliderWithoutPercent(startVal), updateSliderWithoutPercent(finishVal)]);
                }
             });
 
@@ -197,6 +282,10 @@
                     return false;
                 }
             });
+
+            $('body').on('change','select#object_type', function() {
+                changeObjType()
+            });
         });
 
         function updateSlider(realVal, value)
@@ -204,12 +293,37 @@
             return ((value - realVal) / realVal) * 100;
         }
 
+        function updateSliderWithoutPercent(realVal)
+        {
+            return realVal;
+        }
+
         function updateSliderInput(key, valueArr)
         {
-            var value = parseInt($('input[name="' + key + '_value_input"]').data('value'));
+            var value = parseInt($('input[name="' + key + '_value_input"]').data('value')),
+                start_val = getPercent(value, valueArr[0]),
+                finish_val = getPercent(value, valueArr[1]),
+                start_input = $('input[name="' + key + '_start_input"]'),
+                finish_input = $('input[name="' + key + '_finish_input"]');
 
-            $('input[name="' + key + '_start_input"]').val(numberWithSpaces(getPercent(value, valueArr[0])));
-            $('input[name="' + key + '_finish_input"]').val(numberWithSpaces(getPercent(value, valueArr[1])));
+            start_input.val(numberWithSpaces(start_val));
+            start_input.data('value', start_val);
+            finish_input.val(numberWithSpaces(finish_val));
+            finish_input.data('value', finish_val);
+        }
+
+        function updateSliderInputWithoutPercent(key, valueArr)
+        {
+            var value = parseInt($('input[name="' + key + '_value_input"]').data('value')),
+                start_val = valueArr[0],
+                finish_val = valueArr[1],
+                start_input = $('input[name="' + key + '_start_input"]'),
+                finish_input = $('input[name="' + key + '_finish_input"]');
+
+            start_input.val(numberWithSpaces(start_val));
+            start_input.data('value', start_val);
+            finish_input.val(numberWithSpaces(finish_val));
+            finish_input.data('value', finish_val);
         }
 
         function getPercent(value, percent) {
@@ -218,6 +332,29 @@
 
         function numberWithSpaces(x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function changeObjType() {
+            var obj_type = $("select#object_type option:selected").val();
+
+            $.each($('.change_obg_type'), function() {
+                var _this = $(this),
+                    data_type = _this.data('type');
+
+                if (data_type == obj_type) {
+                    if (_this.hasClass('hidden')) {
+                        _this.removeClass('hidden');
+
+                        _this.find('input[type=checkbox]').prop( "checked", true );
+                    }
+                } else {
+                    if (!_this.hasClass('hidden')) {
+                        _this.addClass('hidden');
+
+                        _this.find('input[type=checkbox]').prop( "checked", false );
+                    }
+                }
+            });
         }
     </script>
 @overwrite
@@ -229,6 +366,10 @@
     <style>
         .btm-color .slider-selection {
             background: #00e5ff;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 @show

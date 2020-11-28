@@ -6,6 +6,9 @@ use App\Classes\SalesUp\SalesupMethods;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Classes\SalesUp\SalesupHandler;
+use App\Classes\Filters\MainFilter;
+use App\Classes\Filters\FilterOrders;
+use App\Classes\Filters\FilterCompany;
 
 /**
  * Class WebhookObjectsController
@@ -63,19 +66,6 @@ class WebhookObjectsController extends Controller
     ];
 
     /**
-     * @var array
-     */
-    protected $objectFields = [
-//        'footage' => 'custom-64803',
-        'budget_volume' => 'custom-61758', 'budget_footage' => 'custom-61759'
-    ];
-
-    /**
-     * @var string
-     */
-    protected $disabledCompaniesNameField = 'custom-65680';
-
-    /**
      * @var string
      */
     protected $objectDistrictField = 'custom-64791';
@@ -84,6 +74,7 @@ class WebhookObjectsController extends Controller
      * @var string
      */
     protected $objectProfileOfCompany = 'custom-61774';
+    protected $typeOfPropertyField = 'custom-61755';
 
     /**
      * @param Request $request
@@ -102,17 +93,22 @@ class WebhookObjectsController extends Controller
         $object = $methods->getObject($id);
 
         $address = $object['attributes']['address'];
-        $metroSelect = config('metro')[$this->checkCity($address)];
 
-        $disabledCompanies = strip_tags(str_replace('&nbsp;','',$object['attributes']['customs'][$this->disabledCompaniesNameField]));
-//        $disabledCompanies = implode(',',array_map('trim', $disabledCompanies));
+        $filterClass = new MainFilter();
 
-        $metro = trim(mb_strtolower($object['attributes']['subway-name']));
+        //Конфиги
+        $metroSelect = config('metro')[$filterClass->checkCity($address)];//Метро по городу
+        $companyTypes = config('company_types');//Вид деятельности
+        $typeOfProperties = config('type_of_property');//Тип недвижимости
+
+        //Подготовка значений
+        $metro = trim(mb_strtolower($object['attributes']['subway-name']));//Метро
+//        $disabledCompanies = strip_tags(str_replace('&nbsp;','',$object['attributes']['customs'][$this->disabledCompaniesNameField]));//Не предлагать компаниям
 
         $districtArray = explode(',', str_replace('район','', $object['attributes']['district']));
-        $districtArray = array_map('trim', $districtArray);
+        $districtArray = array_map('trim', $districtArray);//Район
 
-        $addressArray = explode(',', str_replace('пр-кт','', $address));
+        $addressArray = explode(',', str_replace('пр-кт','', $address));//Адрес
         $addressArray = array_map('trim', $addressArray);
 
         if (count($addressArray) == 3) {
@@ -121,31 +117,35 @@ class WebhookObjectsController extends Controller
             $address = $addressArray[2].' '.$addressArray[3];
         } else {
             $address = implode(' ', $addressArray);
-        }
+        }//Адрес
 
-        $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];
+        $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];//Вид деятельности
 
         $objectSlider = [];
 
-        foreach ($this->objectFields as $key => $field) {
+        foreach ($filterClass->objectFields as $key => $field) {
             $objectSlider[$key] = $object['attributes']['customs'][$field];
-        }
+        }//Слайдеры
 
-        $objectSlider['footage'] = $object['attributes']['total-area'];
+        $objectSlider['footage'] = $object['attributes']['total-area'];//Слайдеры
+
+        $typeOfPropertyObj = $object['attributes']['customs'][$this->typeOfPropertyField];//Вид деятельности
 
         $data = [
             'token' => $token,
             'id' => $id,
             'type' => $type,
             'metroSelect' => $metroSelect,
-            'objectTypes' => config('company_types'),
+            'objectTypes' => $companyTypes,
+            'typeOfProperties' => $typeOfProperties,
             'attributes' => $object['attributes'],
-            'disabledCompanies' => $disabledCompanies,
+//            'disabledCompanies' => $disabledCompanies,
             'metro' => $metro,
             'districtArray' => $districtArray,
             'address' => $address,
             'profileCompanies' => $profileCompanies,
-            'objectSlider' => $objectSlider
+            'objectSlider' => $objectSlider,
+            'typeOfPropertyObj' => $typeOfPropertyObj,
         ];
 
         return view('objects.filter', $data);
@@ -159,84 +159,165 @@ class WebhookObjectsController extends Controller
     {
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
+
+        $filterClass = new MainFilter;
+
         $object = $methods->getObject($request->get('id'));
+        $address = $object['attributes']['address'];
+        $typeOfObject = $filterClass->checkCity($address);
 
-        $objectData = [];
+        //Данные по фильтрам
+        $objData = $filterClass->prepareData($request, $object);
 
-        $objectData['footage'] = $this->getArrayByPercent($object['attributes']['total-area'], 'footage', $request);;
-
-        foreach ($this->objectFields as $key => $field) {
-            $objectData[$key] = $this->getArrayByPercent($object['attributes']['customs'][$field], $key, $request);
+        if (empty($objData)) {
+            $msg = "Выберите фильтры";
+            return view('objects.error_page', ['msg' => $msg]);
         }
 
-        $objectData['type'] = $request->get('type');
+        $objData['object_type'] = $request->get('object_type');
 
-        if (!empty($object['attributes']['customs'][$this->disabledCompaniesNameField])) {
-            $objectData['disabledCompaniesName'] = explode(',',strip_tags($object['attributes']['customs'][$this->disabledCompaniesNameField]));
-        } else {
-            $objectData['disabledCompaniesName'] = [];
+        //Получаем Список заявок
+        $orders = $methods->getOrders();
+
+        if (empty($orders)) {
+            $msg = "Заявки не найдены";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
-        $objectData['address'] = $object['attributes']['address'];
+        //Фильтрация по заявкам
+        $filterOrdersClass = new FilterOrders;
+        $filterOrders = [];
 
-        if (
-            empty($request->get('type')) &&
-            empty($request->get('footage_check')) &&
-            empty($request->get('budget_volume_check')) &&
-            empty($request->get('budget_footage_check')) &&
-            empty($request->get('district')) &&
-            empty($request->get('metro')) &&
-            empty($request->get('street'))
-        ) {
-            $msg = "Выберите фильтр";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
+        foreach ($orders as $orderKey => $order) {
+            $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
+
+            if (!empty($orderResponse)) {
+                $filterOrders[] = $order;
+            }
         }
 
-        //Подбираем компании
-        $companies = $methods->getCompanies();
-
-        if (empty($companies)) {
-            $msg = "Компании не найдены";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
+        if (empty($orders)) {
+            $msg = "Заявки не найдены";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
-        //Получаем контакты по компаниям
-        $companyContacts = [];
-        $companyData = [];
-        $additionalContactData = [
-            'district' => $object['attributes']['customs'][$this->objectDistrictField],
-        ];
+        //прописываем связи
+        $orderData = [];
+        $companies = [];
+        $contacts = [];
 
-        foreach ($companies as $company) {
-            $filterResponse = $this->filterCompany($objectData, $request,  $company);
+        foreach ($orders as $order) {
+            $orderData[] = [
+                'type' => 'orders',
+                'id' => $order['id'],
+            ];
 
-            if (empty($filterResponse)) {
-                continue;
+            //Компании
+            if (!empty($order['relationships']['companies']['data'])) {
+                foreach ($order['relationships']['companies']['data'] as $company) {
+                    $companies[$company['id']] = $company['id'];
+                }
             }
 
-            $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
+            //Контакты
+            if (!empty($order['relationships']['contacts']['data'])) {
+                foreach ($order['relationships']['contacts']['data'] as $contact) {
+                    $contacts[$contact['id']] = $contact['id'];
+                }
+            }
+        }
 
-            if (!empty($response)) {
-                $companyData[] = [
+        //Проверяем компании
+        $companiesData = [];
+
+        if (!empty($companies)) {
+//            $filterCompanyClass = new FilterCompany;
+            foreach ($companies as $companyId) {
+                $company = $methods->getCompany($companyId);
+
+                if (!empty($company['relationships']['contacts']['data'])) {
+                    foreach ($company['relationships']['contacts']['data'] as $contact) {
+                        $contacts[$contact['id']] = $contact['id'];
+                    }
+                }
+//                $filterResponse = $filterCompanyClass->filter($company, $objData);
+//
+//                if (empty($filterResponse)) {
+//                    unset($companies[$companyId]);
+//                    continue;
+//                }
+
+//                $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
+//
+//                if (!empty($response)) {
+//                    $companyData[] = [
+//                        'type' => 'companies',
+//                        'id' => $company['id'],
+//                    ];
+//                }
+
+                $companiesData[] = [
                     'type' => 'companies',
-                    'id' => $company['id'],
+                    'id' => $companyId,
                 ];
             }
         }
 
-        if (empty($companyContacts)) {
-            $msg = "Контакты отсутствуют";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
-        }
+        $contactsData = [];
 
-        $contactData = [];
-
-        foreach ($companyContacts as $contactId) {
-            $contactData[] = [
-                'type' => 'contacts',
-                'id' => $contactId
-            ];
+        if (!empty($companies)) {
+            foreach ($contacts as $contactsId) {
+                $contactsData[] = [
+                    'type' => 'contacts',
+                    'id' => $contactsId,
+                ];
+            }
         }
+//        //Подбираем компании
+//        $companies = $methods->getCompanies();
+//
+//        if (empty($companies)) {
+//            $msg = "Компании не найдены";
+//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
+//        }
+//
+//        //Получаем контакты по компаниям
+//        $companyContacts = [];
+//        $companyData = [];
+//        $additionalContactData = [
+//            'district' => $object['attributes']['customs'][$this->objectDistrictField],
+//        ];
+//
+//        foreach ($companies as $company) {
+//            $filterResponse = $this->filterCompany($objectData, $request,  $company);
+//
+//            if (empty($filterResponse)) {
+//                continue;
+//            }
+//
+//            $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
+//
+//            if (!empty($response)) {
+//                $companyData[] = [
+//                    'type' => 'companies',
+//                    'id' => $company['id'],
+//                ];
+//            }
+//        }
+//
+//        if (empty($companyContacts)) {
+//            $msg = "Контакты отсутствуют";
+//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
+//        }
+//
+//        $contactData = [];
+//
+//        foreach ($companyContacts as $contactId) {
+//            $contactData[] = [
+//                'type' => 'contacts',
+//                'id' => $contactId
+//            ];
+//        }
 
         $data = [
             'attributes' => [
@@ -245,14 +326,17 @@ class WebhookObjectsController extends Controller
             ],
             'relationships' => [
                 'contacts' => [
-                    'data' => $contactData,
+                    'data' => $contactsData,
                 ],
                 'companies' => [
-                    'data' => $companyData,
+                    'data' => $companiesData,
+                ],
+                'orders' => [
+                    'data' => $orderData,
                 ],
                 'stage-category' => [
                     'type' => 'stage-category',
-                    'id' => 32315
+                    'id' => 32745,//Воронка постоянных клиентов
                 ],
             ],
         ];
@@ -264,138 +348,10 @@ class WebhookObjectsController extends Controller
         $viewData = [
             'deal' => $objectResponse,
             'object' => $object,
-            'companyCount' => count($companyData),
+            'ordersCount' => count($orders),
         ];
 
         return view('objects.success', $viewData);
-    }
-
-    /**
-     * @param array $objectData
-     * @param $company
-     */
-    protected function filterCompany(array $objectData, $request, $company)
-    {
-        $attributes = $company['attributes'];
-
-        $checkerArray = [];
-
-        foreach ($this->filterCustomsFields as $filterField) {
-            $checker = 1;
-
-            if (empty($attributes['customs'][$filterField['enabled_field']])) {
-                continue;
-            }
-
-            //Не предлагать компаниям
-            if ($request->has('disabled_company_check') && !empty($request->get('disabled_company'))) {
-                $disabledCompanyArray = array_map('trim', explode(',',trim(mb_strtolower($request->get('disabled_company')))));
-                $brandField = trim(mb_strtolower($attributes['customs'][$filterField['brand']]));
-
-                foreach ($disabledCompanyArray as $disabledCompany) {
-                    if (empty($disabledCompany)) {
-                        continue;
-                    }
-
-                    if (strpos($brandField, $disabledCompany) !== false) {
-                        $checker = 0;
-                    }
-                }
-            }
-
-            //Проверяем исключение по типу недвижимости
-            if ($request->has('type_check') && !empty($objectData['type']) && !empty($attributes['customs'][$filterField['type']])) {
-                if (in_array($attributes['customs'][$filterField['type']], $objectData['type'])) {
-                    $checker = 0;
-                }
-            }
-
-            //проверяем по площади
-            foreach (['footage','budget_volume','budget_footage'] as $key) {
-                if (!$request->has($key.'_check')) {
-                    continue;
-                }
-
-                $before = intval($attributes['customs'][$filterField[$key.'_before']]);
-                $after = intval($attributes['customs'][$filterField[$key.'_after']]);
-
-                if ($key == 'budget_volume') {
-                    $before = $before * 1000;
-                    $after = $after * 1000;
-                }
-
-                $crossInterval = $this->crossingInterval($objectData[$key][0], $objectData[$key][1], $before, $after);
-
-                if (!empty($crossInterval)) {
-                    continue;
-                } else {
-                    $checker = 0;
-                }
-            }
-
-            //Проверяем район/метро/дом/кв
-            foreach (['district','street'] as $key) {
-                if (!$request->has($key.'_check')) {
-                    continue;
-                }
-
-                if (empty($request->get($key))) {
-                    continue;
-                }
-
-                $keyArray = array_map('trim', explode(',',trim(mb_strtolower($request->get($key)))));
-
-                $localChecker = 0;
-
-                foreach ($filterField[$key] as $customArray) {
-                    if (empty($attributes['customs'][$customArray['custom']])) {
-                       continue;
-                    }
-
-                    $value = $attributes['customs'][$customArray['custom']];
-
-                    if ($customArray['type'] != 'array') {
-                        $value = array_map('trim', explode(',',trim(mb_strtolower($value))));
-                    } else {
-                        $value = array_map('mb_strtolower', $value);
-                    }
-
-                    foreach ($value as $valueEl) {
-                        foreach ($keyArray as $keyEl) {
-                            if (empty($keyEl)) {
-                                continue;
-                            }
-
-                            if (strpos($valueEl, $keyEl) !== false) {
-                                $localChecker = 1;
-                            }
-                        }
-                    }
-                }
-
-                if (empty($localChecker)) {
-                    $checker = 0;
-                }
-            }
-
-            //Метро
-            if ($request->has('metro_check') && !empty($request->get('metro'))) {
-                $metroSelectId = $this->checkCity($objectData['address']);
-                $metroValue = $attributes['customs'][$filterField['metro_'.$metroSelectId]];
-
-                if (empty($metroValue) || empty(array_intersect($metroValue, $request->get('metro')))) {
-                    $checker = 0;
-                }
-            }
-
-            $checkerArray[] = $checker;
-        }
-
-        if (in_array(1, $checkerArray)) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     /**
@@ -435,64 +391,5 @@ class WebhookObjectsController extends Controller
         }
 
         return $errors;
-    }
-
-    /**
-     * @param $value
-     * @param string $key
-     * @param Request $request
-     * @return array
-     */
-    protected function getArrayByPercent($value, string $key, Request $request)
-    {
-        $percentArr = explode(',', $request->get($key));
-
-        return [
-            $this->percent(intval($value), intval($percentArr[0])),
-            $this->percent(intval($value), intval($percentArr[1])),
-        ];
-    }
-
-    /**
-     * @param $startInt
-     * @param $finishInt
-     * @param $startValue
-     * @param $finishValue
-     * @return int
-     */
-    public function crossingInterval($startInt, $finishInt, $startValue, $finishValue) {
-       if (
-            ($startValue >= $startInt && $startValue <= $finishInt) ||
-            ($finishValue <= $finishInt && $finishValue >= $startInt) ||
-            ($startValue <= $finishInt && $finishValue >= $startInt) ||
-            ($startValue >= $startInt && $finishValue <= $finishInt)
-       ) {
-           return 1;
-       }
-
-       return 0;
-    }
-
-    /**
-     * @param $number
-     * @param $percent
-     * @return float|int
-     */
-    protected function percent($number, $percent) {
-        $numberPercent = ($number / 100) * $percent;
-
-        return intval($number + $numberPercent);
-    }
-
-    /**
-     * @param $address
-     * @return int
-     */
-    protected function checkCity($address)
-    {
-        if (strpos($address,'Петербург') == true) {
-            return 2;
-        }
-        return 1;
     }
 }
