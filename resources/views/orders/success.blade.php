@@ -3,13 +3,13 @@
 @section("content")
     <div class="row text-center">
         <div class="col-lg-12">
-            <b>Сделка: </b><span>№{{$deal['id']}} создана.</span>
+            <b>Сделка: </b><span>№{{$deal['attributes']['number']}} создана.</span>
         </div>
         <div class="col-lg-12">
-            <b>Объект недвижимости: </b><span>{{$object['attributes']['name']}}</span>
+            <b>Заявка: </b><span>№{{$order['id']}}</span>
         </div>
         <div class="col-lg-12">
-            <b>Найдено: </b><span>{{$ordersCount}} заявок</span>
+            <b>Найдено: </b><span>{{$objectsCount}} объектов</span>
         </div>
     </div>
     @parent

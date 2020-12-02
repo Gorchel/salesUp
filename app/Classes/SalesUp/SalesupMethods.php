@@ -77,7 +77,7 @@ class SalesupMethods
         $path = 'orders/'.$orderId;
 
         $data = [
-            'include' => 'companies,contacts',
+            'include' => 'company,contact',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
@@ -250,6 +250,28 @@ class SalesupMethods
         $response = json_decode($jsonResponse, true);
 
         $this->handleError($response, '. Method getObject.');
+
+        return $response['data'];
+    }
+
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getObjects()
+    {
+        $path = 'estate-properties';
+
+        $data = [
+            'include' => 'companies,contacts',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getObjects.');
 
         return $response['data'];
     }

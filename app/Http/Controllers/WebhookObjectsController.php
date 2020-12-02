@@ -196,7 +196,7 @@ class WebhookObjectsController extends Controller
             }
         }
 
-        if (empty($orders)) {
+        if (empty($filterOrders)) {
             $msg = "Заявки не найдены";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
@@ -206,7 +206,7 @@ class WebhookObjectsController extends Controller
         $companies = [];
         $contacts = [];
 
-        foreach ($orders as $order) {
+        foreach ($filterOrders as $order) {
             $orderData[] = [
                 'type' => 'orders',
                 'id' => $order['id'],

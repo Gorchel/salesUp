@@ -212,78 +212,90 @@ class WebhookOrdersController extends Controller
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
 
-        $filterClass = new MainFilter;
+        $object_type = $request->get('object_type');
 
-        $object = $methods->getObject($request->get('id'));
-        $address = $object['attributes']['address'];
+        $filterClass = new MainFilter;
+        $filterOrdersClass = new FilterOrders;
+
+        $order = $methods->getOrder($request->get('id'));
+        $orderCustoms = $order['attributes']['customs'];
+        $address = $orderCustoms[$filterOrdersClass->getCustomArray($object_type, 'address')];
         $typeOfObject = $filterClass->checkCity($address);
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request, $object);
+        $objData = $filterClass->prepareData($request, $order,'order', $object_type);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";
             return view('objects.error_page', ['msg' => $msg]);
         }
 
-        $objData['object_type'] = $request->get('object_type');
+        $objData['object_type'] = $object_type;
 
-        //Получаем Список заявок
-        $orders = $methods->getOrders();
+        //Получаем Список недвижки
+        $objects = $methods->getObjects();
 
-        if (empty($orders)) {
-            $msg = "Заявки не найдены";
+        if (empty($objects)) {
+            $msg = "Недвижимость не найдена";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
         //Фильтрация по заявкам
-        $filterOrdersClass = new FilterOrders;
-        $filterOrders = [];
+        $filterObjects = [];
 
-        foreach ($orders as $orderKey => $order) {
-            $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
+        foreach ($objects as $objectKey => $object) {
+            $objectResponse = $filterOrdersClass->filterObject($object, $objData, $typeOfObject);
 
-            if (!empty($orderResponse)) {
-                $filterOrders[] = $order;
+            if (!empty($objectResponse)) {
+                $filterObjects[] = $object;
             }
         }
 
-        if (empty($orders)) {
-            $msg = "Заявки не найдены";
+        if (empty($filterObjects)) {
+            $msg = "Недвижимость не найдена";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
         //прописываем связи
-        $orderData = [];
         $companies = [];
         $contacts = [];
 
-        foreach ($orders as $order) {
-            $orderData[] = [
-                'type' => 'orders',
-                'id' => $order['id'],
-            ];
-
+        foreach ($filterObjects as $object) {
             //Компании
-            if (!empty($order['relationships']['companies']['data'])) {
-                foreach ($order['relationships']['companies']['data'] as $company) {
+            if (!empty($object['relationships']['companies']['data'])) {
+                foreach ($object['relationships']['companies']['data'] as $company) {
                     $companies[$company['id']] = $company['id'];
                 }
             }
 
             //Контакты
-            if (!empty($order['relationships']['contacts']['data'])) {
-                foreach ($order['relationships']['contacts']['data'] as $contact) {
+            if (!empty($object['relationships']['contacts']['data'])) {
+                foreach ($object['relationships']['contacts']['data'] as $contact) {
                     $contacts[$contact['id']] = $contact['id'];
                 }
             }
         }
 
+        //Проверяем контакты и компании в заявке
+        if (!empty($order['relationships']['contact']['data'])) {
+            $contacts[$order['relationships']['contact']['data']['id']] = $order['relationships']['contact']['data']['id'];
+        }
+
+        if (!empty($order['relationships']['company']['data'])) {
+            $companies[$order['relationships']['company']['data']['id']] = $order['relationships']['company']['data']['id'];
+        }
+
+        $orderData = [
+            [
+                'type' => 'orders',
+                'id' => $order['id'],
+            ]
+        ];
+
         //Проверяем компании
         $companiesData = [];
 
         if (!empty($companies)) {
-//            $filterCompanyClass = new FilterCompany;
             foreach ($companies as $companyId) {
                 $company = $methods->getCompany($companyId);
 
@@ -292,21 +304,6 @@ class WebhookOrdersController extends Controller
                         $contacts[$contact['id']] = $contact['id'];
                     }
                 }
-//                $filterResponse = $filterCompanyClass->filter($company, $objData);
-//
-//                if (empty($filterResponse)) {
-//                    unset($companies[$companyId]);
-//                    continue;
-//                }
-
-//                $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
-//
-//                if (!empty($response)) {
-//                    $companyData[] = [
-//                        'type' => 'companies',
-//                        'id' => $company['id'],
-//                    ];
-//                }
 
                 $companiesData[] = [
                     'type' => 'companies',
@@ -325,56 +322,11 @@ class WebhookOrdersController extends Controller
                 ];
             }
         }
-//        //Подбираем компании
-//        $companies = $methods->getCompanies();
-//
-//        if (empty($companies)) {
-//            $msg = "Компании не найдены";
-//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
-//        }
-//
-//        //Получаем контакты по компаниям
-//        $companyContacts = [];
-//        $companyData = [];
-//        $additionalContactData = [
-//            'district' => $object['attributes']['customs'][$this->objectDistrictField],
-//        ];
-//
-//        foreach ($companies as $company) {
-//            $filterResponse = $this->filterCompany($objectData, $request,  $company);
-//
-//            if (empty($filterResponse)) {
-//                continue;
-//            }
-//
-//            $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
-//
-//            if (!empty($response)) {
-//                $companyData[] = [
-//                    'type' => 'companies',
-//                    'id' => $company['id'],
-//                ];
-//            }
-//        }
-//
-//        if (empty($companyContacts)) {
-//            $msg = "Контакты отсутствуют";
-//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
-//        }
-//
-//        $contactData = [];
-//
-//        foreach ($companyContacts as $contactId) {
-//            $contactData[] = [
-//                'type' => 'contacts',
-//                'id' => $contactId
-//            ];
-//        }
 
         $data = [
             'attributes' => [
-                'name' => 'Сделка по объекту',
-                'description' => $object['attributes']['name'],
+                'name' => 'Сделка по заявке',
+                'description' => $order['id'],
             ],
             'relationships' => [
                 'contacts' => [
@@ -388,22 +340,25 @@ class WebhookOrdersController extends Controller
                 ],
                 'stage-category' => [
                     'type' => 'stage-category',
-                    'id' => 32745,//Воронка постоянных клиентов
+                    'id' => $object_type == 1 ? 32746 : 32747,//Воронка Аренда/Продажа
                 ],
             ],
         ];
 
         $dealResponse = $methods->dealCreate($data);
 
-        $objectResponse = $methods->attachDealToObject($dealResponse['id'], $object['id']);
+        //Закрепление за объектом
+        foreach ($filterObjects as $object) {
+            $objectResponse = $methods->attachDealToObject($dealResponse['id'], $object['id']);
+        }
 
         $viewData = [
-            'deal' => $objectResponse,
-            'object' => $object,
-            'ordersCount' => count($orders),
+            'deal' => $dealResponse,
+            'order' => $order,
+            'objectsCount' => count($objects),
         ];
 
-        return view('objects.success', $viewData);
+        return view('orders.success', $viewData);
     }
 
     /**

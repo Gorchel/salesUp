@@ -87,6 +87,186 @@ class FilterOrders
     ];
 
     /**
+     * @var array
+     */
+    protected $customObjectFields = [
+        'budget_volume' => 'custom-61758',
+        'budget_footage' => 'custom-61759',
+        'payback_period' => 'custom-61718',
+        'type_of_property' => 'custom-61755',
+        'type_of_activity' => 'custom-61774',
+        'metro' => 'custom-65155',
+        'district' => 'custom-65154',
+        'address' => 'custom-65154',
+    ];
+
+    /**
+     * @param $object
+     * @param $objData
+     * @param int $typeOfObjectAddress
+     * @return bool
+     */
+    public function filterObject($object, $objData, $typeOfObjectAddress = 1)
+    {
+        $customFields = $this->customObjectFields;//Массив с ключами
+        $customOrdersFields = $object['attributes']['customs'];//Аттрибуты заявки
+        //проверяем по площади
+        if (!empty($objData['footage'])) {//Если пустое значение поля
+            $value = intval($object['attributes']['total-area']);
+            if (!empty($value)) {
+                $crossInterval = $this->crossingIntervalByValue($value, $objData['footage'][0], $objData['footage'][1]);
+
+                if (empty($crossInterval)) {
+                    return false;
+                }
+            }
+        }
+
+        foreach (['budget_volume','budget_footage'] as $key) {
+            if (empty($objData[$key])) {//Если пустое значение поля
+                continue;
+            }
+
+            $value = intval($customOrdersFields[$customFields[$key]]);
+
+            if (empty($value)) {
+                continue;
+            }
+
+            //Корректировка тысяч
+            if ($key == 'budget_volume') {
+                $value = $value / 1000;
+            }
+
+            $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
+
+            if (empty($crossInterval)) {
+                return false;
+            }
+        }
+
+        //Тип недвижимости / Адресная программа / тип клиента / вид деятельности
+        foreach (['type_of_property','type_of_activity','metro'] as $key) {
+            if (!empty($objData[$key])) {
+                $ordersValues = array_diff($this->getValue($key, $customOrdersFields, $customFields), ['']);
+
+                if (!empty($ordersValues) && empty(array_intersect($ordersValues, $objData[$key]))) {
+                    return false;
+                }
+            }
+        }
+
+        //район
+        foreach (['district'] as $key) {
+            if (empty($objData[$key])) {//Если пустое значение поля
+                continue;
+            }
+
+            $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
+
+            if (!isset( $customFields[$key])) {
+                continue;
+            }
+
+            $customArray = $customFields[$key];//Значения в поле
+
+            //проверяем по городам
+            $checker = 0;
+
+            //Проверяем наличие
+            if (!isset($customOrdersFields[$customArray])) {
+                continue;
+            }
+
+            $objectValue = $customOrdersFields[$customArray];//Значение в заявке
+            $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
+
+            if (empty($objectValue)) {
+                continue;
+            }
+
+            foreach ($objectValue as $objVal) {//Поиск по полю в заявке
+                foreach ($valueArray as $value) {//Значение в фильтре
+                    if (empty($keyEl)) {
+                        continue;
+                    }
+
+                    if (strpos($objVal, $value) === false) {
+                        $checker = 1;
+                    }
+                }
+            }
+
+            if ($checker == 0) {
+                return false;
+            }
+        }
+
+        //Проверяем по адресу
+        foreach (['street','region'] as $key) {
+            if (empty($objData[$key])) {//Если пустое значение поля
+                continue;
+            }
+
+            $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
+
+            if (!isset( $customFields[$key])) {
+                continue;
+            }
+
+            $customArray = $object['attributes']['address'];//Значения в поле
+
+            //проверяем по городам
+            $checker = 0;
+
+            //Проверяем наличие
+            if (!isset($customOrdersFields[$customArray])) {
+                continue;
+            }
+
+            $objectValue = $customOrdersFields[$customArray];//Значение в заявке
+            $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
+
+            if (empty($objectValue)) {
+                continue;
+            }
+
+            foreach ($objectValue as $objVal) {//Поиск по полю в заявке
+                foreach ($valueArray as $value) {//Значение в фильтре
+                    if (empty($keyEl)) {
+                        continue;
+                    }
+
+                    if (strpos($objVal, $value) === false) {
+                        $checker = 1;
+                    }
+                }
+            }
+
+            if ($checker == 0) {
+                return false;
+            }
+        }
+
+        //Предполагаемый срок окупаемости в мес
+        if (!empty($objData['payback_period'])) {
+            if (!empty($objData['payback_period'])) {//Если пустое значение поля
+                $value = intval($customOrdersFields[$customFields['payback_period']]);
+
+                if (!empty($value)) {
+                    $crossInterval = $this->crossingIntervalByValue($value, $objData['payback_period'][0], $objData['payback_period'][1]);
+
+                    if (empty($crossInterval)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param $orders
      * @param $objData
      */
@@ -254,6 +434,22 @@ class FilterOrders
             ($finishValue <= $finishInt && $finishValue >= $startInt) ||
             ($startValue <= $finishInt && $finishValue >= $startInt) ||
             ($startValue >= $startInt && $finishValue <= $finishInt)
+        ) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param $field
+     * @param $startInt
+     * @param $finishInt
+     * @return int
+     */
+    public function crossingIntervalByValue($field, $startInt, $finishInt) {
+        if (
+            $field >= $startInt && $field <= $finishInt
         ) {
             return 1;
         }

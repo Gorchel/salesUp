@@ -203,6 +203,10 @@
             @if ($objectType == 2)
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="is_landlord_check" name="is_landlord_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="is_landlord_check">С Арендаторами</label>
+                        </div>
                         <select name="is_landlord" id="is_landlord" class="form-control">
                             <option value="Да" {{in_array('Да',$isLandlord)  ? 'selected="selected"' : ''}}>Да</option>
                             <option value="Нет" {{in_array('Нет',$isLandlord) ? 'selected="selected"' : ''}}>Нет</option>
