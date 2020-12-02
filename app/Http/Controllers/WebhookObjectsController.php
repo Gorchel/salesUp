@@ -69,12 +69,29 @@ class WebhookObjectsController extends Controller
      * @var string
      */
     protected $objectDistrictField = 'custom-64791';
+    /**
+     * @var array
+     */
+    protected $status2id = [
+        'ППА' => 112196,
+        'Аренда' => 112197,
+        'Продажа' => 112198,
+        'Управление' => 112199,
+        'Комиссия' => 120414,
+    ];
 
     /**
      * @var string
      */
     protected $objectProfileOfCompany = 'custom-61774';
+    /**
+     * @var string
+     */
     protected $typeOfPropertyField = 'custom-61755';
+    /**
+     * @var string
+     */
+    protected $typeOfDealField = 'custom-62518';//Тип сделки
 
     /**
      * @param Request $request
@@ -319,6 +336,18 @@ class WebhookObjectsController extends Controller
 //            ];
 //        }
 
+        $typeOfDeal = array_values(array_diff($object['attributes']['customs'][$this->typeOfDealField],['']));
+        $dealStatuses = [];
+
+        if (!empty($typeOfDeal)) {
+            $typeOfDeal = $this->status2id[$typeOfDeal[0]];
+
+            $dealStatuses = [
+                'type' => 'deal-statuses',
+                'id' => $typeOfDeal,
+            ];
+        }
+
         $data = [
             'attributes' => [
                 'name' => 'Сделка по объекту',
@@ -334,6 +363,9 @@ class WebhookObjectsController extends Controller
                 'orders' => [
                     'data' => $orderData,
                 ],
+                'status' => [
+                    'data' => $dealStatuses,
+                ],
                 'stage-category' => [
                     'type' => 'stage-category',
                     'id' => 32745,//Воронка постоянных клиентов
@@ -346,7 +378,7 @@ class WebhookObjectsController extends Controller
         $objectResponse = $methods->attachDealToObject($dealResponse['id'], $object['id']);
 
         $viewData = [
-            'deal' => $objectResponse,
+            'deal' => $dealResponse,
             'object' => $object,
             'ordersCount' => count($orders),
         ];

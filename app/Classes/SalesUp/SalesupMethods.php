@@ -297,6 +297,26 @@ class SalesupMethods
     }
 
     /**
+     * @param int $objectId
+     */
+    public function getDealStatuses()
+    {
+        $path = 'deal-statuses';
+
+        $data = [
+//            'include' => 'deals',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getDealStatuses.');
+
+        return $response['data'];
+    }
+
+    /**
      * @param int $dealId
      * @param int $objectId
      * @return mixed
