@@ -17,6 +17,7 @@ class FilterOrders
     protected $customFields = [
         1 => [//сдам
             'type_of_property' => 'custom-67826',
+            'address' => 'custom-67827',
             'city' => [
                 'street' => [
                     1 => ['custom' => 'custom-67921', 'type' => 'str'],//msk
@@ -34,6 +35,9 @@ class FilterOrders
             'address_program' => 'custom-67884',
             'client_type' => 'custom-67822',
             'type_of_activity' => 'custom-67947',
+            'footage' => 'custom-67828',
+            'budget_volume' => 'custom-67829',
+            'budget_footage' => 'custom-67829',//????
             'ranges' => [
                 'footage' => [
                     'from' => 'custom-67904',
@@ -51,6 +55,7 @@ class FilterOrders
         ],
         2 => [//Куплю
             'type_of_property' => 'custom-67849',
+            'address' => 'custom-67850',
             'city' => [
                 'district' => [
                     1 => ['custom' => 'custom-67945', 'type' => 'array'],//msk
@@ -63,6 +68,10 @@ class FilterOrders
             ],
             'address_program' => 'custom-67911',
             'client_type' => 'custom-67822',
+            'footage' => 'custom-67851',
+            'budget_volume' => 'custom-67853',
+            'payback_period' => 'custom-67853',
+            'is_landlord' => 'custom-67855',
             'ranges' => [
                 'footage' => [
                     'from' => 'custom-67882',
@@ -217,6 +226,19 @@ class FilterOrders
 //        }
 
         return true;
+    }
+
+    /**
+     * @param $type
+     * @return mixed
+     */
+    public function getCustomArray($type, $field)
+    {
+        if (isset($this->customFields[$type][$field])) {
+            return $this->customFields[$type][$field];
+        }
+
+        return null;
     }
 
     /**

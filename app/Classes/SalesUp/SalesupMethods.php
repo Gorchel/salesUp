@@ -47,11 +47,34 @@ class SalesupMethods
     }
 
     /**
-     * @param int $dealId
+     * @return mixed
+     * @throws \Exception
      */
     public function getOrders()
     {
         $path = 'orders';
+
+        $data = [
+            'include' => 'companies,contacts',
+        ];
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getOrders.');
+
+        return $response['data'];
+    }
+
+    /**
+     * @param $orderId
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getOrder($orderId)
+    {
+        $path = 'orders/'.$orderId;
 
         $data = [
             'include' => 'companies,contacts',
@@ -169,6 +192,11 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param int $contactId
+     * @return mixed
+     * @throws \Exception
+     */
     public function getContact(int $contactId)
     {
         $path = 'contacts/'.$contactId;
@@ -184,6 +212,11 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param array $filters
+     * @return mixed
+     * @throws \Exception
+     */
     public function getContacts(array $filters = [])
     {
         $path = 'contacts';
@@ -241,6 +274,12 @@ class SalesupMethods
         return $response['data'];
     }
 
+    /**
+     * @param int $dealId
+     * @param int $objectId
+     * @return mixed
+     * @throws \Exception
+     */
     public function attachDealToObject(int $dealId, int $objectId) {
         $path = 'estate-properties/'.$objectId;
 

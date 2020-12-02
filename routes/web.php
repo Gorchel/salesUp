@@ -28,3 +28,4 @@ $router->get('/weebhook_estate_get', ['uses' => 'WebhookObjectsController@webhoo
 $router->get('/copy', ['uses' => 'WebhookController@copyContactsView']);
 
 $router->get('/weebhook_orders_filter', ['uses' => 'WebhookOrdersController@webhookOrdersFilter']);
+$router->get('/weebhook_orders_get', ['uses' => 'WebhookOrdersController@webhookOrdersGet']);
