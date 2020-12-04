@@ -272,10 +272,6 @@ class FilterOrders
      */
     public function filter($order, $objData, $typeOfObjectAddress = 1)
     {
-        if (!empty($order['attributes']['discarded-at'])) {
-            return false;
-        }
-
         $customFields = $this->customFields[$objData['object_type']];//Массив с ключами
         $customOrdersFields = $order['attributes']['customs'];//Аттрибуты заявки
 

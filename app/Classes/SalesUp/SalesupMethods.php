@@ -50,12 +50,16 @@ class SalesupMethods
      * @return mixed
      * @throws \Exception
      */
-    public function getOrders()
+    public function getOrders($number = 1, $size = 100)
     {
         $path = 'orders';
 
         $data = [
             'include' => 'companies,contacts',
+            'page' => [
+                'number' => $number,
+                'size' => $size,
+            ],
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
@@ -64,7 +68,7 @@ class SalesupMethods
 
         $this->handleError($response, '. Method getOrders.');
 
-        return $response['data'];
+        return $response;
     }
 
     /**

@@ -193,19 +193,47 @@ class WebhookObjectsController extends Controller
 
         $objData['object_type'] = $request->get('object_type');
 
-        //Получаем Список заявок
-        $orders = $methods->getOrders();
+        //Фильтрация по заявкам
+        $filterOrdersClass = new FilterOrders;
+        $filterOrders = [];
+        $activeOrders = [];
 
-        if (empty($orders)) {
+        //Получаем Список заявок
+        $ordersData = $methods->getOrders();
+
+        if (empty($ordersData['data'])) {
             $msg = "Заявки не найдены";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
-        //Фильтрация по заявкам
-        $filterOrdersClass = new FilterOrders;
-        $filterOrders = [];
+        foreach ($ordersData['data'] as $orderKey => $order) {
+            if (empty($order['attributes']['discarded-at'])) {
+                $activeOrders[] = $order;
+            }
+        }
 
-        foreach ($orders as $orderKey => $order) {
+        $pageNumber = $ordersData['meta']['page-count'];
+
+        if ($pageNumber > 1) {
+            for ($page = 2; $page<=$pageNumber; $page++) {
+                $ordersData = $methods->getOrders($page);
+
+                if (!empty($ordersData['data'])) {
+                    foreach ($ordersData['data'] as $orderKey => $order) {
+                        if (empty($order['attributes']['discarded-at'])) {
+                            $activeOrders[] = $order;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($activeOrders)) {
+            $msg = "Заявки не найдены";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+        }
+
+        foreach ($activeOrders as $order) {
             $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
 
             if (!empty($orderResponse)) {
@@ -290,51 +318,6 @@ class WebhookObjectsController extends Controller
                 ];
             }
         }
-//        //Подбираем компании
-//        $companies = $methods->getCompanies();
-//
-//        if (empty($companies)) {
-//            $msg = "Компании не найдены";
-//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
-//        }
-//
-//        //Получаем контакты по компаниям
-//        $companyContacts = [];
-//        $companyData = [];
-//        $additionalContactData = [
-//            'district' => $object['attributes']['customs'][$this->objectDistrictField],
-//        ];
-//
-//        foreach ($companies as $company) {
-//            $filterResponse = $this->filterCompany($objectData, $request,  $company);
-//
-//            if (empty($filterResponse)) {
-//                continue;
-//            }
-//
-//            $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
-//
-//            if (!empty($response)) {
-//                $companyData[] = [
-//                    'type' => 'companies',
-//                    'id' => $company['id'],
-//                ];
-//            }
-//        }
-//
-//        if (empty($companyContacts)) {
-//            $msg = "Контакты отсутствуют";
-//            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objectData)]);
-//        }
-//
-//        $contactData = [];
-//
-//        foreach ($companyContacts as $contactId) {
-//            $contactData[] = [
-//                'type' => 'contacts',
-//                'id' => $contactId
-//            ];
-//        }
 
         $typeOfDeal = array_values(array_diff($object['attributes']['customs'][$this->typeOfDealField],['']));
         $dealStatuses = [];
