@@ -32,7 +32,7 @@ class FilterOrders
                     2 => 'custom-67939',//spb
                 ],
             ],
-            'address_program' => 'custom-67884',
+            'address_program' => 'custom-67911',
             'client_type' => 'custom-67822',
             'type_of_activity' => 'custom-67947',
             'footage' => 'custom-67828',
@@ -272,15 +272,30 @@ class FilterOrders
      */
     public function filter($order, $objData, $typeOfObjectAddress = 1)
     {
+        if (!empty($order['attributes']['discarded-at'])) {
+            return false;
+        }
+
         $customFields = $this->customFields[$objData['object_type']];//Массив с ключами
         $customOrdersFields = $order['attributes']['customs'];//Аттрибуты заявки
 
-        //Тип недвижимости / Адресная программа / тип клиента / вид деятельности
-        foreach (['type_of_property', 'address_program', 'client_type','type_of_activity'] as $key) {
+        //Тип недвижимости / вид деятельности
+        foreach (['type_of_property','type_of_activity'] as $key) {
             if (!empty($objData[$key])) {
                 $ordersValues = array_diff($this->getValue($key, $customOrdersFields, $customFields), ['']);
 
                 if (!empty($ordersValues) && empty(array_intersect($ordersValues, $objData[$key]))) {
+                    return false;
+                }
+            }
+        }
+
+        //Значение/массив / Адресная программа / тип клиента
+        foreach (['address_program', 'client_type'] as $key) {
+            if (!empty($objData[$key])) {
+                $ordersValues = array_diff(array_map('trim', $this->getValue($key, $customOrdersFields, $customFields)), ['']);
+
+                if (!empty($ordersValues) && !in_array($objData[$key], $ordersValues)) {
                     return false;
                 }
             }

@@ -203,8 +203,8 @@
                         <label class="custom-control-label" for="client_type_check">Клиент</label>
                     </div>
                     <select name="client_type" id="client_type" class="form-control">
-                        <option value="1">cетевой</option>
-                        <option value="2">не сетевой</option>
+                        <option value="сетевой">сетевой</option>
+                        <option value="не сетевой">не сетевой</option>
                     </select>
                 </div>
             </div>

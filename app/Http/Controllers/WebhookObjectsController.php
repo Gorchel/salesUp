@@ -213,6 +213,8 @@ class WebhookObjectsController extends Controller
             }
         }
 
+        dd($filterOrders);
+
         if (empty($filterOrders)) {
             $msg = "Заявки не найдены";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
