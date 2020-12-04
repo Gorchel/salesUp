@@ -380,7 +380,7 @@ class WebhookObjectsController extends Controller
         $viewData = [
             'deal' => $dealResponse,
             'object' => $object,
-            'ordersCount' => count($orders),
+            'ordersCount' => count($filterOrders),
         ];
 
         return view('objects.success', $viewData);
