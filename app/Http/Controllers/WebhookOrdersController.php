@@ -179,7 +179,7 @@ class WebhookOrdersController extends Controller
         $regionArray = [];
 
         //С арендодатором
-        $isLandlord = '';
+        $isLandlord = [];
 
         $is_landlord = $filterOrdersClass->getCustomArray($objectTypeId, 'is_landlord');
 
