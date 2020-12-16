@@ -8,8 +8,12 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <select name="object_type" id="object_type" class="form-control">
-                        <option value="1">Сниму/Сдам</option>
-                        <option value="2">Куплю/Продам</option>
+                        <select name="object_type" id="object_type" class="form-control">
+                            <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сниму</option>
+                            <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Сдам</option>
+                            <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
+                            <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Продам</option>
+                        </select>
                     </select>
                 </div>
             </div>
@@ -35,31 +39,34 @@
                     <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
                 </div>
             </div>
-            <div class="row change_obg_type" data-type="1">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="type_of_activity_check" name="type_of_activity_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="type_of_activity_check">По Виду деятельности</label>
+            @if (in_array($objectType, [1,2]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="type_of_activity_check" name="type_of_activity_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="type_of_activity_check">По Виду деятельности</label>
+                        </div>
+                        <select name="type_of_activity[]" id="type_of_activity" class="form-control" multiple="multiple">
+                            @foreach ($objectTypes as $key => $value)
+                                <option value="{{$value}}" {{in_array($value, $profileCompanies) ? 'selected="selected"' : ''}}>{{$value}}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <select name="type_of_activity[]" id="type_of_activity" class="form-control" multiple="multiple">
-                        @foreach ($objectTypes as $key => $value)
-                            <option value="{{$value}}" {{in_array($value, $profileCompanies) ? 'selected="selected"' : ''}}>{{$value}}</option>
-                        @endforeach
-                    </select>
                 </div>
-            </div>
-            <div class="row change_obg_type" data-type="1">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="address_program_check" name="address_program_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="address_program_check">Есть ли адрессная программа?</label>
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="address_program_check" name="address_program_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="address_program_check">Есть ли адрессная программа?</label>
+                        </div>
+                        <select name="address_program" id="address_program" class="form-control">
+                            <option value="Да">Да</option>
+                            <option value="Нет">Нет</option>
+                        </select>
                     </div>
-                    <select name="address_program" id="address_program" class="form-control">
-                        <option value="Да">Да</option>
-                        <option value="Нет">Нет</option>
-                    </select>
                 </div>
-            </div>
+            @endif
+
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
@@ -134,32 +141,34 @@
                     </div>
                 </div>
             </div>
-            <div class="row change_obg_type" data-type="1">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
+            @if (in_array($objectType, [1,2]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
+                                    <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
+                                </div>
+                                <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                             </div>
-                            <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="0">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" name="budget_footage_value_input" data-value="{{intval($objectSlider['budget_footage'])}}" value="{{number_format(intval($objectSlider['budget_footage']),0,' ',' ')}}" readonly="readonly">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="0">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="0">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="budget_footage_value_input" data-value="{{intval($objectSlider['budget_footage'])}}" value="{{number_format(intval($objectSlider['budget_footage']),0,' ',' ')}}" readonly="readonly">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
 {{--            <div class="row">--}}
 {{--                <div class="col-lg-10 offset-lg-1 form-group">--}}
 {{--                    <div class="custom-control custom-checkbox">--}}
@@ -169,33 +178,34 @@
 {{--                    <input type="text" class="form-control input-sm" name="disabled_company" value="{{$disabledCompanies}}">--}}
 {{--                </div>--}}
 {{--            </div>--}}
-
-            <div class="row change_obg_type" data-type="2">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="payback_period_check">Предполагаемый срок окупаемости в мес</label>
+            @if (in_array($objectType, [3,4]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1" checked="checked">
+                                    <label class="custom-control-label" for="payback_period_check">Предполагаемый срок окупаемости в мес</label>
+                                </div>
+                                <input id="payback_period" name="payback_period" type="text" class="btm-color" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[12,24]" style="width: 80%;"/>&nbsp;<b>&nbsp;мес.</b>
                             </div>
-                            <input id="payback_period" name="payback_period" type="text" class="btm-color" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[12,24]" style="width: 80%;"/>&nbsp;<b>&nbsp;мес.</b>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_start_input" value="0">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" name="payback_period_value_input" data-value="16" value="16" readonly="readonly">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_finish_input" value="0">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_start_input" value="0">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="payback_period_value_input" data-value="16" value="16" readonly="readonly">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="payback_period" name="payback_period_finish_input" value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">

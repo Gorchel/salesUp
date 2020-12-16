@@ -89,6 +89,12 @@ class WebhookOrdersController extends Controller
         $type = $request->get('type');
         $objectType = $request->has('object_type') ? $request->get('object_type') : 1;
 
+        if (in_array($objectType, [1,2])) {
+            $objectTypeId = 1;
+        } else {
+            $objectTypeId = 2;
+        }
+
         $filterOrdersClass = new FilterOrders;
 
         $handler = new SalesupHandler($request->get('token'));
@@ -96,7 +102,7 @@ class WebhookOrdersController extends Controller
         $orders = $methods->getOrder($id);
         $orderCustoms = $orders['attributes']['customs'];
 
-        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'address')];
+        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'address')];
         $filterClass = new MainFilter();
 //
 //        //Конфиги
@@ -104,7 +110,7 @@ class WebhookOrdersController extends Controller
         $companyTypes = config('company_types');//Вид деятельности
         $typeOfProperties = config('type_of_property');//Тип недвижимости
 
-        $city = $filterOrdersClass->getCustomArray($objectType, 'city');
+        $city = $filterOrdersClass->getCustomArray($objectTypeId, 'city');
 
         $metro = $orderCustoms[$city['metro'][$filterClass->checkCity($address)]];
 
@@ -124,7 +130,7 @@ class WebhookOrdersController extends Controller
             $address = implode(' ', $addressArray);
         }//Адрес
 
-        $type_of_activity = $filterOrdersClass->getCustomArray($objectType, 'type_of_activity');
+        $type_of_activity = $filterOrdersClass->getCustomArray($objectTypeId, 'type_of_activity');
         $profileCompanies = [];
 
         if (!empty($type_of_activity)) {
@@ -141,29 +147,29 @@ class WebhookOrdersController extends Controller
 
         $objectSlider['footage'] = 100;
 
-        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'budget_volume')])) {
-            $objectSlider['footage'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'footage')];
+        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')])) {
+            $objectSlider['footage'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'footage')];
         }
 
         $objectSlider['budget_volume'] = 100;
 
-        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'budget_volume')])) {
-            $objectSlider['budget_volume'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'budget_volume')];
+        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')])) {
+            $objectSlider['budget_volume'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')];
         }
 
         $objectSlider['budget_footage'] = 100;
-        $budget_footage = $filterOrdersClass->getCustomArray($objectType, 'budget_footage');
+        $budget_footage = $filterOrdersClass->getCustomArray($objectTypeId, 'budget_footage');
 
         if (isset($budget_footage) && !empty($orderCustoms[$budget_footage])) {
             $objectSlider['budget_footage'] = $orderCustoms[$budget_footage];
         }
 
         //Вид деятельности
-        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectType, 'type_of_property')];
+        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'type_of_property')];
 
         //Срок окупаемости
 //        $objectSlider['payback_period'] = 16;
-//        $payback_period = $filterOrdersClass->getCustomArray($objectType, 'payback_period');
+//        $payback_period = $filterOrdersClass->getCustomArray($objectTypeId, 'payback_period');
 //
 //        if (isset($payback_period) && !empty($orderCustoms[$payback_period])) {
 //            $objectSlider['payback_period'] = $orderCustoms[$payback_period];
@@ -175,7 +181,7 @@ class WebhookOrdersController extends Controller
         //С арендодатором
         $isLandlord = '';
 
-        $is_landlord = $filterOrdersClass->getCustomArray($objectType, 'is_landlord');
+        $is_landlord = $filterOrdersClass->getCustomArray($objectTypeId, 'is_landlord');
 
         if (isset($is_landlord) && !empty($orderCustoms[$is_landlord])) {
             $isLandlord = $orderCustoms[$is_landlord];
@@ -214,23 +220,29 @@ class WebhookOrdersController extends Controller
 
         $object_type = $request->get('object_type');
 
+        if (in_array($object_type, [1,2])) {
+            $object_type_id = 1;
+        } else {
+            $object_type_id = 2;
+        }
+
         $filterClass = new MainFilter;
         $filterOrdersClass = new FilterOrders;
 
         $order = $methods->getOrder($request->get('id'));
         $orderCustoms = $order['attributes']['customs'];
-        $address = $orderCustoms[$filterOrdersClass->getCustomArray($object_type, 'address')];
+        $address = $orderCustoms[$filterOrdersClass->getCustomArray($object_type_id, 'address')];
         $typeOfObject = $filterClass->checkCity($address);
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request, $order,'order', $object_type);
+        $objData = $filterClass->prepareData($request, $order,'order', $object_type_id);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";
             return view('objects.error_page', ['msg' => $msg]);
         }
 
-        $objData['object_type'] = $object_type;
+        $objData['object_type'] = $object_type_id;
 
         //Получаем Список недвижки
         $objects = $methods->getObjects();
@@ -340,7 +352,7 @@ class WebhookOrdersController extends Controller
                 ],
                 'stage-category' => [
                     'type' => 'stage-category',
-                    'id' => $object_type == 1 ? 32746 : 32747,//Воронка Аренда/Продажа
+                    'id' => $object_type_id == 1 ? 32746 : 32747,//Воронка Аренда/Продажа
                 ],
             ],
         ];
