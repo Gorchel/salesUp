@@ -28,16 +28,16 @@
                     </select>
                 </div>
             </div>
-            <div class="row change_obg_type" data-type="1">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="streetCheck">Улица, Дом</label>
-                    </div>
-                    <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
-                </div>
-            </div>
             @if (in_array($objectType, [1,2]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="streetCheck">Улица, Дом</label>
+                        </div>
+                        <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
@@ -166,6 +166,10 @@
                         </div>
                     </div>
                 </div>
+            @else
+                <div class="row hidden">
+                    <input id="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                </div>
             @endif
 {{--            <div class="row">--}}
 {{--                <div class="col-lg-10 offset-lg-1 form-group">--}}
@@ -202,6 +206,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            @else
+                <div class="row hidden">
+                    <input id="payback_period" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             @endif
             <div class="row">
