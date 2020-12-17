@@ -171,7 +171,7 @@ class WebhookObjectsController extends Controller
             'profileCompanies' => $profileCompanies,
             'objectSlider' => $objectSlider,
             'typeOfPropertyObj' => $typeOfPropertyObj,
-            '$objectType' => $objectType,
+            'objectType' => $objectType,
         ];
 
         return view('objects.filter', $data);
