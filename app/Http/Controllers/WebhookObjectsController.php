@@ -111,6 +111,14 @@ class WebhookObjectsController extends Controller
 
         $address = $object['attributes']['address'];
 
+        $objectType = $request->has('object_type') ? $request->get('object_type') : 1;
+
+        if (in_array($objectType, [1,2])) {
+            $objectTypeId = 1;
+        } else {
+            $objectTypeId = 2;
+        }
+
         $filterClass = new MainFilter();
 
         //Конфиги
@@ -163,6 +171,7 @@ class WebhookObjectsController extends Controller
             'profileCompanies' => $profileCompanies,
             'objectSlider' => $objectSlider,
             'typeOfPropertyObj' => $typeOfPropertyObj,
+            '$objectType' => $objectType,
         ];
 
         return view('objects.filter', $data);
