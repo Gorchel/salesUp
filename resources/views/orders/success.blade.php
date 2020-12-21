@@ -6,9 +6,6 @@
             <b>Сделка: </b><span>№{{$deal['attributes']['number']}} создана.</span>
         </div>
         <div class="col-lg-12">
-            <b>Заявка: </b><span>№{{$order['id']}}</span>
-        </div>
-        <div class="col-lg-12">
             <b>Найдено: </b><span>{{$objectsCount}} объектов</span>
         </div>
     </div>

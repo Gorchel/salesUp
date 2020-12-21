@@ -50,7 +50,7 @@ class SalesupMethods
      * @return mixed
      * @throws \Exception
      */
-    public function getOrders($number = 1, $size = 100)
+    public function getOrders($number = 1, $size = 100, $filters = [])
     {
         $path = 'orders';
 
@@ -62,11 +62,44 @@ class SalesupMethods
             ],
         ];
 
+        if (!empty($filters)) {
+            $data['filter'] = $filters;
+        }
+
         $jsonResponse = $this->getRequest($path, $data);
 
         $response = json_decode($jsonResponse, true);
 
         $this->handleError($response, '. Method getOrders.');
+
+        return $response;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getPaginationObjects($number = 1, $size = 100, $filters = [])
+    {
+        $path = 'estate-properties';
+
+        $data = [
+            'include' => 'companies,contacts',
+            'page' => [
+                'number' => $number,
+                'size' => $size,
+            ],
+        ];
+
+        if (!empty($filters)) {
+            $data['filter'] = $filters;
+        }
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getPaginationObjects.');
 
         return $response;
     }

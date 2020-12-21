@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Classes\SalesUp\SalesupMethods;
+use App\Orders;
+use App\Properties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Classes\SalesUp\SalesupHandler;
@@ -87,55 +89,49 @@ class WebhookOrdersController extends Controller
         $id = $request->get('ids')[0];
         $token = $request->get('token');
         $type = $request->get('type');
-        $objectType = $request->has('object_type') ? $request->get('object_type') : 1;
-
-        if (in_array($objectType, [1,2])) {
-            $objectTypeId = 1;
-        } else {
-            $objectTypeId = 2;
-        }
+        $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 1;
 
         $filterOrdersClass = new FilterOrders;
 
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
-        $orders = $methods->getOrder($id);
-        $orderCustoms = $orders['attributes']['customs'];
+//        $orders = $methods->getOrder($id);
+//        $orderCustoms = $orders['attributes']['customs'];
 
-        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'address')];
+//        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'address')];
         $filterClass = new MainFilter();
 //
 //        //Конфиги
-        $metroSelect = config('metro')[$filterClass->checkCity($address)];//Метро по городу
+        $metroSelect = config('metro')[1];//Метро по городу
         $companyTypes = config('company_types');//Вид деятельности
-        $typeOfProperties = config('type_of_property');//Тип недвижимости
+        $typeOfProperties = config('type_of_property')[$objectTypeId];//Тип недвижимости
 
         $city = $filterOrdersClass->getCustomArray($objectTypeId, 'city');
 
-        $metro = $orderCustoms[$city['metro'][$filterClass->checkCity($address)]];
+//        $metro = $orderCustoms[$city['metro'][$filterClass->checkCity($address)]];
 
 ////        $disabledCompanies = strip_tags(str_replace('&nbsp;','',$object['attributes']['customs'][$this->disabledCompaniesNameField]));//Не предлагать компаниям
 //
 //        $districtArray = explode(',', str_replace('район','', $object['attributes']['district']));
 //        $districtArray = array_map('trim', $districtArray);//Район
 //
-        $addressArray = explode(',', str_replace('пр-кт','', $address));//Адрес
-        $addressArray = array_map('trim', $addressArray);
+//        $addressArray = explode(',', str_replace('пр-кт','', $address));//Адрес
+//        $addressArray = array_map('trim', $addressArray);
 
-        if (count($addressArray) == 3) {
-            $address = $addressArray[1].' '.$addressArray[2];
-        } else if (count($addressArray) == 4) {
-            $address = $addressArray[2].' '.$addressArray[3];
-        } else {
-            $address = implode(' ', $addressArray);
-        }//Адрес
+//        if (count($addressArray) == 3) {
+//            $address = $addressArray[1].' '.$addressArray[2];
+//        } else if (count($addressArray) == 4) {
+//            $address = $addressArray[2].' '.$addressArray[3];
+//        } else {
+//            $address = implode(' ', $addressArray);
+//        }//Адрес
 
         $type_of_activity = $filterOrdersClass->getCustomArray($objectTypeId, 'type_of_activity');
         $profileCompanies = [];
 
-        if (!empty($type_of_activity)) {
-            $profileCompanies = $orderCustoms[$type_of_activity];//Вид деятельности
-        }
+//        if (!empty($type_of_activity)) {
+//            $profileCompanies = $orderCustoms[$type_of_activity];//Вид деятельности
+//        }
 
 //
         $objectSlider = [];
@@ -165,7 +161,7 @@ class WebhookOrdersController extends Controller
         }
 
         //Вид деятельности
-        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'type_of_property')];
+//        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'type_of_property')];
 
         //Срок окупаемости
 //        $objectSlider['payback_period'] = 16;
@@ -195,14 +191,14 @@ class WebhookOrdersController extends Controller
             'objectTypes' => $companyTypes,
             'typeOfProperties' => $typeOfProperties,
 //            'attributes' => $object['attributes'],
-            'metro' => $metro,
+            'metro' => [],
             'districtArray' => $districtArray,
             'regionArray' => $regionArray,
-            'address' => $address,
+            'address' => null,
             'profileCompanies' => $profileCompanies,
             'objectSlider' => $objectSlider,
-            'typeOfPropertyObj' => $typeOfPropertyObj,
-            'objectType' => $objectType,
+            'typeOfPropertyObj' => [],
+            'objectType' => $objectTypeId,
             'isLandlord' => $isLandlord,
         ];
 
@@ -220,89 +216,88 @@ class WebhookOrdersController extends Controller
 
         $object_type = $request->get('object_type');
 
-        if (in_array($object_type, [1,2])) {
-            $object_type_id = 1;
-        } else {
-            $object_type_id = 2;
-        }
-
         $filterClass = new MainFilter;
         $filterOrdersClass = new FilterOrders;
 
-        $order = $methods->getOrder($request->get('id'));
-        $orderCustoms = $order['attributes']['customs'];
-        $address = $orderCustoms[$filterOrdersClass->getCustomArray($object_type_id, 'address')];
-        $typeOfObject = $filterClass->checkCity($address);
+        $typeOfObject = 1;
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request, $order,'order', $object_type_id);
+        $objData = $filterClass->prepareData($request,'order', $object_type);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";
             return view('objects.error_page', ['msg' => $msg]);
         }
 
-        $objData['object_type'] = $object_type_id;
+        $objData['object_type'] = $object_type;
+        $filterOrders = [];
 
-        //Получаем Список недвижки
-        $objects = $methods->getObjects();
+        if (in_array($object_type, [1,2])) {
+            //Получаем Список заявок
+            Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+                foreach ($orders as $order) {
+                    $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
+                }
 
-        if (empty($objects)) {
-            $msg = "Недвижимость не найдена";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-        }
+                if (!empty($orderResponse)) {
+                    $filterOrders[] = $order;
+                }
+            });
 
-        //Фильтрация по заявкам
-        $filterObjects = [];
-
-        foreach ($objects as $objectKey => $object) {
-            $objectResponse = $filterOrdersClass->filterObject($object, $objData, $typeOfObject);
-
-            if (!empty($objectResponse)) {
-                $filterObjects[] = $object;
+            if (empty($filterOrders)) {
+                $msg = "Заявки не найдены";
+                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
-        }
+        } else {
+            //Получаем Список заявок
+            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+                foreach ($properties as $property) {
+                    $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $typeOfObject);
+                }
 
-        if (empty($filterObjects)) {
-            $msg = "Недвижимость не найдена";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+                if (!empty($orderResponse)) {
+                    $filterOrders[] = $property;
+                }
+            });
+
+            if (empty($filterOrders)) {
+                $msg = "Объекты недвижимости не найдены";
+                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+            }
         }
 
         //прописываем связи
         $companies = [];
         $contacts = [];
 
-        foreach ($filterObjects as $object) {
+        foreach ($filterOrders as $order) {
+            $relationships = json_decode($order['relationships'], true);
+
             //Компании
-            if (!empty($object['relationships']['companies']['data'])) {
-                foreach ($object['relationships']['companies']['data'] as $company) {
+            if (!empty($relationships['companies']['data'])) {
+                foreach ($relationships['companies']['data'] as $company) {
                     $companies[$company['id']] = $company['id'];
                 }
             }
 
             //Контакты
-            if (!empty($object['relationships']['contacts']['data'])) {
-                foreach ($object['relationships']['contacts']['data'] as $contact) {
+            if (!empty($relationships['contacts']['data'])) {
+                foreach ($relationships['contacts']['data'] as $contact) {
                     $contacts[$contact['id']] = $contact['id'];
                 }
             }
         }
 
-        //Проверяем контакты и компании в заявке
-        if (!empty($order['relationships']['contact']['data'])) {
-            $contacts[$order['relationships']['contact']['data']['id']] = $order['relationships']['contact']['data']['id'];
-        }
+        $orderData = [];
 
-        if (!empty($order['relationships']['company']['data'])) {
-            $companies[$order['relationships']['company']['data']['id']] = $order['relationships']['company']['data']['id'];
+        if (in_array($object_type, [1,2])) {
+            foreach ($filterOrders as $order) {
+                $orderData[] = [
+                    'type' => 'orders',
+                    'id' => $order['id'],
+                ];
+            }
         }
-
-        $orderData = [
-            [
-                'type' => 'orders',
-                'id' => $order['id'],
-            ]
-        ];
 
         //Проверяем компании
         $companiesData = [];
@@ -335,6 +330,18 @@ class WebhookOrdersController extends Controller
             }
         }
 
+        switch ($object_type) {
+            case 1:
+            case 2:
+                $stage = 32747;
+                break;
+            case 3:
+                $stage = 32746;
+                break;
+            default:
+                $stage = 32747;
+        }
+
         $data = [
             'attributes' => [
                 'name' => 'Сделка по заявке',
@@ -352,22 +359,22 @@ class WebhookOrdersController extends Controller
                 ],
                 'stage-category' => [
                     'type' => 'stage-category',
-                    'id' => $object_type_id == 1 ? 32746 : 32747,//Воронка Аренда/Продажа
+                    'id' => $stage,//Воронка Аренда/Продажа
                 ],
             ],
         ];
 
         $dealResponse = $methods->dealCreate($data);
 
-        //Закрепление за объектом
-        foreach ($filterObjects as $object) {
-            $objectResponse = $methods->attachDealToObject($dealResponse['id'], $object['id']);
+        if (in_array($object_type, [3,4])) {
+            foreach ($filterOrders as $order) {
+                $methods->attachDealToObject($dealResponse['id'], $order['id']);
+            }
         }
 
         $viewData = [
             'deal' => $dealResponse,
-            'order' => $order,
-            'objectsCount' => count($objects),
+            'objectsCount' => count($filterOrders),
         ];
 
         return view('orders.success', $viewData);

@@ -20,7 +20,8 @@ class MainFilter
      */
     protected $filterList = [
         'type_of_property','street','type_of_activity','address_program','district','metro',
-        'footage','budget_volume','budget_footage','payback_period','client_type','region','is_landlord'
+        'footage','budget_volume','budget_footage','payback_period','client_type','region','is_landlord',
+        'client_type'
 //        'disabled_company',
     ];
 
@@ -35,7 +36,7 @@ class MainFilter
     /**
      * @return array
      */
-    public function prepareData(Request $request, $object, $type = "object", $object_type = null)
+    public function prepareData(Request $request, $type = "object", $object_type = null)
     {
         $data = [];
 
@@ -45,49 +46,77 @@ class MainFilter
             }
         }
 
-        if ($type == 'object') {
-            if (isset($data['footage'])) {
-                $data['footage'] = $this->getArrayByPercent($object['attributes']['total-area'], 'footage', $data);;
-            }
+        if (isset($data['footage'])) {
+            $data['footage'] = $this->getArrayByPercent(100, 'footage', $data);;
+        }
 
-            foreach ($this->objectFields as $key => $field) {
-                if (isset($data[$key])) {
-                    $data[$key] = $this->getArrayByPercent($object['attributes']['customs'][$field], $key, $data);
-                }
-            }
-        } else {
-            $filterOrdersClass = new FilterOrders;
+        if (isset($data['budget_volume'])) {
+            $budget_volume = $this->getArrayByPercent(100, 'budget_volume', $data);
 
-            if (isset($data['footage'])) {
-                $footage = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'footage')], 'footage', $data);
-
-                if (!empty($footage)) {
-                    $data['footage'] = $footage;
-                } else {
-                    $data['footage'] = null;
-                }
-            }
-
-            if (isset($data['budget_volume'])) {
-                $budget_volume = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'budget_volume')], 'budget_volume', $data);
-
-                if (!empty($budget_volume)) {
-                    $data['budget_volume'] = $budget_volume;
-                } else {
-                    $data['budget_volume'] = null;
-                }
-            }
-
-            if (isset($data['budget_footage'])) {
-                $budget_footage = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'budget_footage')], 'budget_footage', $data);
-
-                if (!empty($budget_footage)) {
-                    $data['budget_footage'] = $budget_footage;
-                } else {
-                    $data['budget_footage'] = null;
-                }
+            if (!empty($budget_volume)) {
+                $data['budget_volume'] = $budget_volume;
+            } else {
+                $data['budget_volume'] = null;
             }
         }
+
+        if (isset($data['budget_footage'])) {
+            $budget_volume = $this->getArrayByPercent(100, 'budget_footage', $data);
+
+            if (!empty($budget_volume)) {
+                $data['budget_footage'] = $budget_volume;
+            } else {
+                $data['budget_footage'] = null;
+            }
+        }
+
+//        if ($type == 'object') {
+//            if (isset($data['footage'])) {
+//                $data['footage'] = $this->getArrayByPercent($object['attributes']['total-area'], 'footage', $data);;
+//            }
+//
+//            foreach ($this->objectFields as $key => $field) {
+//                if (isset($data[$key])) {
+//                    $data[$key] = $this->getArrayByPercent($object['attributes']['customs'][$field], $key, $data);
+//                }
+//            }
+//        } else {
+//            $filterOrdersClass = new FilterOrders;
+//
+//            if (isset($data['footage'])) {
+//                $footage = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'footage')], 'footage', $data);
+//
+//                if (!empty($footage)) {
+//                    $data['footage'] = $footage;
+//                } else {
+//                    $data['footage'] = null;
+//                }
+//            }
+//
+//            if (isset($data['budget_volume'])) {
+//                $budget_volume = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'budget_volume')], 'budget_volume', $data);
+//
+//                if (!empty($budget_volume)) {
+//                    $data['budget_volume'] = $budget_volume;
+//                } else {
+//                    $data['budget_volume'] = null;
+//                }
+//            }
+//
+//            if (isset($data['budget_footage'])) {
+//                $key = $filterOrdersClass->getCustomArray($object_type, 'budget_footage');
+//
+//                if (!empty($key)) {
+//                    $budget_footage = $this->getArrayByPercent($object['attributes']['customs'][$key], 'budget_footage', $data);
+//
+//                    if (!empty($budget_footage)) {
+//                        $data['budget_footage'] = $budget_footage;
+//                    } else {
+//                        $data['budget_footage'] = null;
+//                    }
+//                }
+//            }
+//        }
 
         if (isset($data['payback_period'])) {
             $data['payback_period'] = explode(',', $data['payback_period']);

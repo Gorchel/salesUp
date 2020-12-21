@@ -8,10 +8,10 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <select name="object_type" id="object_type" class="form-control">
-                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сниму</option>
-                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Сдам</option>
+                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>
+                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>
                         <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
-                        <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Продам</option>
+                        <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Сниму</option>
                     </select>
                 </div>
             </div>
@@ -137,7 +137,7 @@
                     </div>
                 </div>
             </div>
-            @if (in_array($objectType, [1,2]))
+            @if (in_array($objectType, [1,4]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="row">
@@ -170,7 +170,7 @@
                 </div>
             @endif
 
-            @if (in_array($objectType, [3,4]))
+            @if (in_array($objectType, [2,3]))
                 <div class="row change_obg_type" data-type="2">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="row">
@@ -202,7 +202,7 @@
                     <input id="payback_period" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             @endif
-            @if (in_array($objectType, [3,4]))
+            @if (in_array($objectType, [4]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
@@ -212,6 +212,20 @@
                         <select name="is_landlord" id="is_landlord" class="form-control">
                             <option value="Да" {{in_array('Да',$isLandlord)  ? 'selected="selected"' : ''}}>Да</option>
                             <option value="Нет" {{in_array('Нет',$isLandlord) ? 'selected="selected"' : ''}}>Нет</option>
+                        </select>
+                    </div>
+                </div>
+            @endif
+            @if (in_array($objectType, [1,2]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="client_type_check">Клиент</label>
+                        </div>
+                        <select name="client_type" id="client_type" class="form-control">
+                            <option value="сетевой">сетевой</option>
+                            <option value="не сетевой">не сетевой</option>
                         </select>
                     </div>
                 </div>
