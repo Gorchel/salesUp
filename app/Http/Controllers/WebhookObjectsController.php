@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Classes\SalesUp\SalesupMethods;
+use App\Properties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Classes\SalesUp\SalesupHandler;
 use App\Classes\Filters\MainFilter;
 use App\Classes\Filters\FilterOrders;
 use App\Classes\Filters\FilterCompany;
+use App\Orders;
 
 /**
  * Class WebhookObjectsController
@@ -195,6 +197,8 @@ class WebhookObjectsController extends Controller
         //Данные по фильтрам
         $objData = $filterClass->prepareData($request, $object);
 
+        dd($objData);
+
         if (empty($objData)) {
             $msg = "Выберите фильтры";
             return view('objects.error_page', ['msg' => $msg]);
@@ -205,55 +209,42 @@ class WebhookObjectsController extends Controller
         //Фильтрация по заявкам
         $filterOrdersClass = new FilterOrders;
         $filterOrders = [];
-        $activeOrders = [];
 
-        //Получаем Список заявок
-        $ordersData = $methods->getOrders();
-
-        if (empty($ordersData['data'])) {
-            $msg = "Заявки не найдены";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-        }
-
-        foreach ($ordersData['data'] as $orderKey => $order) {
-            if (empty($order['attributes']['discarded-at'])) {
-                $activeOrders[] = $order;
-            }
-        }
-
-        $pageNumber = $ordersData['meta']['page-count'];
-
-        if ($pageNumber > 1) {
-            for ($page = 2; $page<=$pageNumber; $page++) {
-                $ordersData = $methods->getOrders($page);
-
-                if (!empty($ordersData['data'])) {
-                    foreach ($ordersData['data'] as $orderKey => $order) {
-                        if (empty($order['attributes']['discarded-at'])) {
-                            $activeOrders[] = $order;
-                        }
-                    }
+        if (in_array($request->get('object_type'), [1,2])) {
+            //Получаем Список заявок
+            Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+                foreach ($orders as $order) {
+                    $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
                 }
+
+                if (!empty($orderResponse)) {
+                    $filterOrders[] = $order;
+                }
+            });
+
+            if (empty($filterOrders)) {
+                $msg = "Заявки не найдены";
+                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+            }
+        } else {
+            //Получаем Список заявок
+            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+                foreach ($properties as $property) {
+                    $orderResponse = $filterOrdersClass->filter($property, $objData, $typeOfObject);
+                }
+
+                if (!empty($orderResponse)) {
+                    $filterOrders[] = $property;
+                }
+            });
+
+            if (empty($filterOrders)) {
+                $msg = "Обйекты недвижимости не найдены";
+                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
         }
 
-        if (empty($activeOrders)) {
-            $msg = "Заявки не найдены";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-        }
-
-        foreach ($activeOrders as $order) {
-            $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
-
-            if (!empty($orderResponse)) {
-                $filterOrders[] = $order;
-            }
-        }
-
-        if (empty($filterOrders)) {
-            $msg = "Заявки не найдены";
-            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-        }
+        dd($filterOrders);
 
         //прописываем связи
         $orderData = [];

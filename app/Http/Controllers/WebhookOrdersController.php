@@ -81,6 +81,7 @@ class WebhookOrdersController extends Controller
     /**
      * @param Request $request
      * @return \Illuminate\View\View
+     * @throws \Exception
      */
     public function webhookOrdersFilter(Request $request)
     {
@@ -90,23 +91,24 @@ class WebhookOrdersController extends Controller
         $token = $request->get('token');
         $type = $request->get('type');
         $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 1;
+        $cityTypeId = $request->has('city_type') ? $request->get('city_type') : 1;
 
         $filterOrdersClass = new FilterOrders;
 
         $handler = new SalesupHandler($request->get('token'));
         $methods = $handler->methods;
-//        $orders = $methods->getOrder($id);
-//        $orderCustoms = $orders['attributes']['customs'];
+        $order = $methods->getOrder($id);
+        $orderCustoms = $order['attributes']['customs'];
 
 //        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'address')];
         $filterClass = new MainFilter();
 //
 //        //Конфиги
-        $metroSelect = config('metro')[1];//Метро по городу
+        $metroSelect = config('metro')[$cityTypeId];//Метро по городу
         $companyTypes = config('company_types');//Вид деятельности
         $typeOfProperties = config('type_of_property')[$objectTypeId];//Тип недвижимости
 
-        $city = $filterOrdersClass->getCustomArray($objectTypeId, 'city');
+//        $city = $filterOrdersClass->getCustomArray($objectTypeId, 'city');
 
 //        $metro = $orderCustoms[$city['metro'][$filterClass->checkCity($address)]];
 
@@ -134,31 +136,7 @@ class WebhookOrdersController extends Controller
 //        }
 
 //
-        $objectSlider = [];
-
-        foreach ($filterClass->objectFields as $key => $field) {
-//            $objectSlider[$key] = $object['attributes']['customs'][$field];
-            $objectSlider[$key] = 100;
-        }//Слайдеры
-
-        $objectSlider['footage'] = 100;
-
-        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')])) {
-            $objectSlider['footage'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'footage')];
-        }
-
-        $objectSlider['budget_volume'] = 100;
-
-        if (!empty($orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')])) {
-            $objectSlider['budget_volume'] = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'budget_volume')];
-        }
-
-        $objectSlider['budget_footage'] = 100;
-        $budget_footage = $filterOrdersClass->getCustomArray($objectTypeId, 'budget_footage');
-
-        if (isset($budget_footage) && !empty($orderCustoms[$budget_footage])) {
-            $objectSlider['budget_footage'] = $orderCustoms[$budget_footage];
-        }
+        $objectSlider = $filterClass->getSliderOrderData($objectTypeId, $orderCustoms);
 
         //Вид деятельности
 //        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'type_of_property')];
@@ -200,6 +178,7 @@ class WebhookOrdersController extends Controller
             'typeOfPropertyObj' => [],
             'objectType' => $objectTypeId,
             'isLandlord' => $isLandlord,
+            'cityTypeId' => $cityTypeId,
         ];
 
         return view('orders.filter', $data);
@@ -215,14 +194,15 @@ class WebhookOrdersController extends Controller
         $methods = $handler->methods;
 
         $object_type = $request->get('object_type');
+        $cityTypeId = $request->get('$cityTypeId');
 
         $filterClass = new MainFilter;
         $filterOrdersClass = new FilterOrders;
 
-        $typeOfObject = 1;
+        $order = $methods->getOrder($request->get('id'));
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request,'order', $object_type);
+        $objData = $filterClass->prepareData($request,$order, 'order', $object_type);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";
@@ -234,15 +214,16 @@ class WebhookOrdersController extends Controller
 
         if (in_array($object_type, [1,2])) {
             //Получаем Список заявок
-            Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
-                foreach ($orders as $order) {
-                    $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
-                }
+            Orders::where('type',$object_type)
+                ->query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
+                    foreach ($orders as $order) {
+                        $orderResponse = $filterOrdersClass->filter($order, $objData, $cityTypeId);
+                    }
 
-                if (!empty($orderResponse)) {
-                    $filterOrders[] = $order;
-                }
-            });
+                    if (!empty($orderResponse)) {
+                        $filterOrders[] = $order;
+                    }
+                });
 
             if (empty($filterOrders)) {
                 $msg = "Заявки не найдены";
@@ -250,9 +231,9 @@ class WebhookOrdersController extends Controller
             }
         } else {
             //Получаем Список заявок
-            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
                 foreach ($properties as $property) {
-                    $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $typeOfObject);
+                    $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $cityTypeId);
                 }
 
                 if (!empty($orderResponse)) {

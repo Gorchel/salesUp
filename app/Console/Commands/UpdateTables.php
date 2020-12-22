@@ -150,6 +150,7 @@ class UpdateTables extends Command
 
         $orderModel->updated_at = $attributes['updated-at'];
         $orderModel->customs = json_encode($attributes['customs']);
+        $orderModel->type = $this->getType($attributes['customs']['custom-67821']);
 
         unset($attributes['customs']);
 
@@ -162,6 +163,20 @@ class UpdateTables extends Command
 
         $orderModel->relationships = json_encode($relationships);
         $orderModel->save();
+    }
+
+    protected function getType($str)
+    {
+        switch($str) {
+            case 'Сдам':
+                return 1;
+            case 'Продам':
+                return 2;
+            case 'Куплю':
+                return 3;
+            default:
+                return 4;
+        }
     }
 
     /**

@@ -36,7 +36,7 @@ class MainFilter
     /**
      * @return array
      */
-    public function prepareData(Request $request, $type = "object", $object_type = null)
+    public function prepareData(Request $request, $order, $type = "object", $object_type = null)
     {
         $data = [];
 
@@ -46,12 +46,16 @@ class MainFilter
             }
         }
 
-        if (isset($data['footage'])) {
-            $data['footage'] = $this->getArrayByPercent(100, 'footage', $data);;
+        $orderCustoms = $order['attributes']['customs'];
+
+        $sliderData = $this->getSliderOrderData($object_type, $orderCustoms);
+
+        if (!empty($sliderData['footage'])) {
+            $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);;
         }
 
-        if (isset($data['budget_volume'])) {
-            $budget_volume = $this->getArrayByPercent(100, 'budget_volume', $data);
+        if (!empty($sliderData['budget_volume'])) {
+            $budget_volume = $this->getArrayByPercent($sliderData['budget_volume'], 'budget_volume', $data);
 
             if (!empty($budget_volume)) {
                 $data['budget_volume'] = $budget_volume;
@@ -60,8 +64,8 @@ class MainFilter
             }
         }
 
-        if (isset($data['budget_footage'])) {
-            $budget_volume = $this->getArrayByPercent(100, 'budget_footage', $data);
+        if (!empty($sliderData['budget_footage'])) {
+            $budget_volume = $this->getArrayByPercent($sliderData['budget_footage'], 'budget_footage', $data);
 
             if (!empty($budget_volume)) {
                 $data['budget_footage'] = $budget_volume;
@@ -123,6 +127,37 @@ class MainFilter
         }
 
         return $data;
+    }
+
+    public function getSliderOrderData($objectTypeId, $orderCustoms)
+    {
+        $objectSlider = [];
+
+        $filterOrdersClass = new FilterOrders;
+        $ranges = $filterOrdersClass->getCustomArray($objectTypeId, 'ranges');
+
+        foreach (['footage', 'budget_volume', 'budget_footage'] as $key) {
+            if (isset($ranges[$key])) {
+                if (isset($ranges[$key]['value']) && !empty($ranges[$key]['value'])) {
+                    $keyValue = $orderCustoms[$ranges[$key]['value']];
+
+                    if (!empty($keyValue)) {
+                        $objectSlider[$key] = $keyValue;
+                    }
+                } else {
+                    $from = (int) $orderCustoms[$ranges[$key]['from']];
+                    $to = (int) $orderCustoms[$ranges[$key]['to']];
+
+                    $value = ($from + $to) / 2;
+
+                    if (!empty($value)) {
+                        $objectSlider[$key] = $value;
+                    }
+                }
+            }
+        }//Слайдеры
+
+        return $objectSlider;
     }
 
     /**

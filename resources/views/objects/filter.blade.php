@@ -9,9 +9,10 @@
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <select name="object_type" id="object_type" class="form-control">
                         <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сниму</option>
-                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Сдам</option>
-                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
-                        <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Продам</option>
+                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>
+{{--                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Сдам</option>--}}
+{{--                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>--}}
+
                     </select>
                 </div>
             </div>
@@ -28,7 +29,7 @@
                     </select>
                 </div>
             </div>
-            @if (in_array($objectType, [1,2]))
+            @if (in_array($objectType, [1]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
@@ -139,7 +140,7 @@
                     </div>
                 </div>
             </div>
-            @if (in_array($objectType, [1,2]))
+            @if (in_array($objectType, [1]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="row">
@@ -168,7 +169,7 @@
                 </div>
             @else
                 <div class="row hidden">
-                    <input id="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                    <input id="budget_footage" type="hidden" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             @endif
 {{--            <div class="row">--}}
@@ -180,7 +181,7 @@
 {{--                    <input type="text" class="form-control input-sm" name="disabled_company" value="{{$disabledCompanies}}">--}}
 {{--                </div>--}}
 {{--            </div>--}}
-            @if (in_array($objectType, [3,4]))
+            @if (in_array($objectType, [2,3]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="row">
@@ -209,9 +210,10 @@
                 </div>
             @else
                 <div class="row hidden">
-                    <input id="payback_period" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                    <input id="payback_period" type="hidden" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             @endif
+
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
@@ -300,7 +302,8 @@
             });
 
             $('body').on('change','select#object_type', function() {
-                changeObjType()
+                // changeObjType()
+                location.href = location.href + '&object_type=' + $("select#object_type option:selected").val();
             });
         });
 

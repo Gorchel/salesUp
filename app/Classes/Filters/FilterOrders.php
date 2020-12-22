@@ -40,17 +40,12 @@ class FilterOrders
             'budget_footage' => 'custom-67829',//????
             'ranges' => [
                 'footage' => [
-                    'from' => 'custom-67904',
-                    'to' => 'custom-67905'
+                    'value' => 'custom-67828',
                 ], //По площади (кв/м)
                 'budget_volume' => [
-                    'from' => 'custom-67906',
-                    'to' => 'custom-67907'
-                ],// По бюджету, руб.мес.  в диапазоне от до
-                'budget_footage' => [
-                    'from' => 'custom-67908',
-                    'to' => 'custom-67909'
-                ],//По бюджету за 1 кв/м в мес
+                    'value' => 'custom-67829',
+                ],//По бюджету, руб.мес.  в диапазоне от до
+                'payback_period' => 'custom-67892',//Предполагаемый срок окупаемости
             ],
         ],
         2 => [//продам
@@ -74,23 +69,48 @@ class FilterOrders
             'is_landlord' => 'custom-67855',
             'ranges' => [
                 'footage' => [
-                    'from' => 'custom-67882',
-                    'to' => 'custom-67883'
+                    'value' => 'custom-67851',
                 ], //По площади (кв/м)
                 'budget_volume' => [
-                    'from' => 'custom-67880',
-                    'to' => 'custom-67881'
+                    'value' => 'custom-67853',
                 ],//По бюджету, руб.мес.  в диапазоне от до
+                'budget_footage' => [
+                    'value' => 'custom-67854',
+                ],//По бюджету за 1 кв/м в мес
                 'payback_period' => 'custom-67892',//Предполагаемый срок окупаемости
             ],
         ],
         3 => [//куплю
             'type_of_property' => 'custom-61755',
             'address' => 'custom-67827',
+            'ranges' => [
+                'footage' => [
+                    'from' => 'custom-67882',
+                    'to' => 'custom-67883'
+                ], //По площади (кв/м)
+                'budget_volume' => [
+                    'from' => 'custom-67880',
+                    'to' => 'custom-67881'
+                ],// По бюджету, руб.мес.  в диапазоне от до
+            ],
         ],
         4 => [//сниму
             'type_of_property' => 'custom-61755',
             'address' => 'custom-67827',
+            'ranges' => [
+                'footage' => [
+                    'from' => 'custom-67904',
+                    'to' => 'custom-67905'
+                ], //По площади (кв/м)
+                'budget_volume' => [
+                    'from' => 'custom-67906',
+                    'to' => 'custom-67907'
+                ],// По бюджету, руб.мес.  в диапазоне от до
+                'budget_footage' => [
+                    'from' => 'custom-67908',
+                    'to' => 'custom-67909'
+                ],//По бюджету за 1 кв/м в мес
+            ],
         ],
     ];
 
