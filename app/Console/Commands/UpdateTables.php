@@ -188,25 +188,26 @@ class UpdateTables extends Command
             ->first();
 
         $attributes = $property['attributes'];
+        $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
 
         if (empty($propertyModel)) {
             $propertyModel = new Properties;
             $propertyModel->id = $property['id'];
-            $propertyModel->created_at = Carbon::parse($attributes['created-at'])->format('Y-m-d H:i:s');
+            $propertyModel->created_at = $now;
         } else {
             if (!empty($attributes['discarded-at'])) {
                 $propertyModel->delete();
                 return;
             }
 
-            $updatedAt = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
+//            $updatedAt = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
 
-            if ($propertyModel->updated_at == $updatedAt) {
+            if ($propertyModel->updated_at == $now) {
                 return;
             }
         }
 
-        $propertyModel->updated_at = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
+        $propertyModel->updated_at = $now;
         $propertyModel->customs = json_encode($attributes['customs']);
 
         unset($attributes['customs']);
