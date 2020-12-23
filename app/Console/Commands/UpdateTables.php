@@ -128,18 +128,22 @@ class UpdateTables extends Command
             ->first();
 
         $attributes = $order['attributes'];
+
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
+
+        if (!empty($attributes['discarded-at'])) {
+            if (!empty($propertyModel)) {
+                $orderModel->delete();
+            }
+
+            return;
+        }
 
         if (empty($orderModel)) {
             $orderModel = new Orders;
             $orderModel->id = $order['id'];
             $orderModel->created_at = $now;
         } else {
-            if (!empty($attributes['discarded-at'])) {
-                $orderModel->delete();
-                return;
-            }
-
             if ($orderModel->updated_at == $now) {
                 return;
             }
@@ -147,7 +151,12 @@ class UpdateTables extends Command
 
         $orderModel->updated_at = $now;
         $orderModel->customs = json_encode($attributes['customs']);
-        $orderModel->type = $this->getType($attributes['customs']['custom-67821']);
+
+        $type = array_values(array_diff(array_map('trim', $attributes['customs']['custom-67821']), ['']));
+
+        if (isset($type[0])) {
+            $orderModel->type = $this->getType($type[0]);
+        }
 
         unset($attributes['customs']);
 
@@ -231,9 +240,9 @@ class UpdateTables extends Command
     {
         switch($str) {
             case 'Аренда':
-                return 1;
+                return 4;
             case 'Продажа':
-                return 2;
+                return 3;
             default:
                 return null;
         }

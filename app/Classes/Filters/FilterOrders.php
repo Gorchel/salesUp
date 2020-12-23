@@ -114,19 +114,29 @@ class FilterOrders
         ],
     ];
 
-    /**
-     * @var array
-     */
     protected $customPropertyFields = [
-        'budget_volume' => 'custom-61758',
-        'budget_footage' => 'custom-61759',
-        'payback_period' => 'custom-61718',
-        'type_of_property' => 'custom-61755',
-        'type_of_activity' => 'custom-61774',
-        'metro' => 'custom-65155',
-        'district' => 'custom-65154',
-        'address' => 'custom-65154',
-        'is_landlord_check' => 'custom-61757',
+        3 => [//Куплю
+            'budget_volume' => 'custom-61706',
+            'budget_footage' => 'custom-61708',
+            'payback_period' => 'custom-61718',
+            'type_of_property' => 'custom-61755',
+            'type_of_activity' => 'custom-61774',
+            'metro' => 'custom-65155',
+            'district' => 'custom-65154',
+            'address' => 'custom-65154',
+            'is_landlord_check' => 'custom-61757',
+        ],
+        4 => [//Аренда
+            'budget_volume' => 'custom-61758',
+            'budget_footage' => 'custom-61759',
+            'payback_period' => 'custom-61718',
+            'type_of_property' => 'custom-61755',
+            'type_of_activity' => 'custom-61774',
+            'metro' => 'custom-65155',
+            'district' => 'custom-65154',
+            'address' => 'custom-65154',
+            'is_landlord_check' => 'custom-61757',
+        ]
     ];
 
     /**
@@ -305,9 +315,9 @@ class FilterOrders
      * @param int $typeOfObjectAddress
      * @return bool
      */
-    public function filterProperty($property, $objData, $typeOfObjectAddress = 1)
+    public function filterProperty($property, $objData, $typeOfObjectAddress = 1, $object_type)
     {
-        $customFields = $this->customPropertyFields;//Массив с ключами
+        $customFields = $this->customPropertyFields[$object_type];//Массив с ключами
 
         $attributes = json_decode($property['attributes'], true);
         $customs = json_decode($property['customs'], true);
@@ -366,51 +376,55 @@ class FilterOrders
             }
         }
 
+
+
         //район
-//        foreach (['district'] as $key) {
-//            if (empty($objData[$key])) {//Если пустое значение поля
+        foreach (['district'] as $key) {
+            if (empty($objData[$key])) {//Если пустое значение поля
+                continue;
+            }
+
+            $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
+
+            if (!isset( $customFields[$key])) {
+                continue;
+            }
+
+            $customArray = $customFields[$key];//Значения в поле
+
+            //проверяем по городам
+            $checker = 0;
+
+            //Проверяем наличие
+//            if (!isset([$customs])) {
 //                continue;
 //            }
-//
-//            $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
-//
-//            if (!isset( $customFields[$key])) {
-//                continue;
-//            }
-//
-//            $customArray = $customFields[$key];//Значения в поле
-//
-//            //проверяем по городам
-//            $checker = 0;
-//
-//            //Проверяем наличие
-//            if (!isset([$customArray])) {
-//                continue;
-//            }
-//
-//            $objectValue = $customs[$customArray];//Значение в заявке
-//            $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
-//
-//            if (empty($objectValue)) {
-//                continue;
-//            }
-//
-//            foreach ($objectValue as $objVal) {//Поиск по полю в заявке
-//                foreach ($valueArray as $value) {//Значение в фильтре
-//                    if (empty($keyEl)) {
-//                        continue;
-//                    }
-//
-//                    if (strpos($objVal, $value) === false) {
-//                        $checker = 1;
-//                    }
-//                }
-//            }
-//
-//            if ($checker == 0) {
-//                return false;
-//            }
-//        }
+
+            $objectValue = $customs[$customArray];//Значение в заявке
+            $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
+
+            if (empty($objectValue)) {
+                continue;
+            }
+
+            $mainChecker = 1;
+
+            foreach ($objectValue as $objVal) {//Поиск по полю в заявке
+                foreach ($valueArray as $value) {//Значение в фильтре
+                    if (empty($keyEl)) {
+                        continue;
+                    }
+
+                    if (strpos($objVal, $value) === false) {
+                        $checker = 1;
+                    }
+                }
+            }
+
+            if ($checker == 0) {
+                return false;
+            }
+        }
 
         //Проверяем по адресу
         foreach (['street','region'] as $key) {

@@ -215,7 +215,7 @@ class WebhookOrdersController extends Controller
         if (in_array($object_type, [1,2])) {
             //Получаем Список заявок
             Orders::where('type',$object_type)
-                ->query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
+                ->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
                     foreach ($orders as $order) {
                         $orderResponse = $filterOrdersClass->filter($order, $objData, $cityTypeId);
                     }
@@ -231,9 +231,10 @@ class WebhookOrdersController extends Controller
             }
         } else {
             //Получаем Список заявок
-            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
+            Properties::where('type', $object_type)
+                ->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData, $object_type) {
                 foreach ($properties as $property) {
-                    $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $cityTypeId);
+                    $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $cityTypeId, $object_type);
                 }
 
                 if (!empty($orderResponse)) {
@@ -246,6 +247,8 @@ class WebhookOrdersController extends Controller
                 return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
         }
+
+        dd($filterOrders);
 
         //прописываем связи
         $companies = [];
