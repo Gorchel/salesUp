@@ -192,19 +192,21 @@ class UpdateTables extends Command
         if (empty($propertyModel)) {
             $propertyModel = new Properties;
             $propertyModel->id = $property['id'];
-            $propertyModel->created_at = $attributes['created-at'];
+            $propertyModel->created_at = Carbon::parse($attributes['created-at'])->format('Y-m-d H:i:s');
         } else {
             if (!empty($attributes['discarded-at'])) {
                 $propertyModel->delete();
                 return;
             }
 
-            if ($propertyModel->updated_at == $attributes['updated-at']) {
+            $updatedAt = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
+
+            if ($propertyModel->updated_at == $updatedAt) {
                 return;
             }
         }
 
-        $propertyModel->updated_at = $attributes['updated-at'];
+        $propertyModel->updated_at = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
         $propertyModel->customs = json_encode($attributes['customs']);
 
         unset($attributes['customs']);
