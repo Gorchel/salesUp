@@ -132,23 +132,24 @@ class UpdateTables extends Command
             ->first();
 
         $attributes = $order['attributes'];
+        $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
 
         if (empty($orderModel)) {
             $orderModel = new Orders;
             $orderModel->id = $order['id'];
-            $orderModel->created_at = $attributes['created-at'];
+            $orderModel->created_at = $now;
         } else {
             if (!empty($attributes['discarded-at'])) {
                 $orderModel->delete();
                 return;
             }
 
-            if ($orderModel->updated_at == $attributes['updated-at']) {
+            if ($orderModel->updated_at == $now) {
                 return;
             }
         }
 
-        $orderModel->updated_at = $attributes['updated-at'];
+        $orderModel->updated_at = $now;
         $orderModel->customs = json_encode($attributes['customs']);
         $orderModel->type = $this->getType($attributes['customs']['custom-67821']);
 
