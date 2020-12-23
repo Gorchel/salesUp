@@ -65,36 +65,32 @@ class UpdateTables extends Command
         //Получаем Список заявок
         $ordersData = $methods->getOrders(1, self::COUNT_PER_PAGE, $filters);
 
-        if (empty($ordersData['data'])) {
-            return;
-        }
+        if (!empty($ordersData['data'])) {
+            $this->eachOrders($ordersData['data']);
 
-        $this->eachOrders($ordersData['data']);
+            $pageNumber = $ordersData['meta']['page-count'];
 
-        $pageNumber = $ordersData['meta']['page-count'];
-
-        if ($pageNumber > 1) {
-            for ($page = 2; $page<=$pageNumber; $page++) {
-                $ordersData = $methods->getOrders($page, self::COUNT_PER_PAGE, $filters);
-                $this->eachOrders($ordersData['data']);
+            if ($pageNumber > 1) {
+                for ($page = 2; $page<=$pageNumber; $page++) {
+                    $ordersData = $methods->getOrders($page, self::COUNT_PER_PAGE, $filters);
+                    $this->eachOrders($ordersData['data']);
+                }
             }
         }
 
         //Получаем Список недвижки
         $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE, $filters);
 
-        if (empty($propertyData['data'])) {
-            return;
-        }
+        if (!empty($propertyData['data'])) {
+            $this->eachProperties($propertyData['data']);
 
-        $this->eachProperties($propertyData['data']);
+            $pageNumber = $propertyData['meta']['page-count'];
 
-        $pageNumber = $propertyData['meta']['page-count'];
-
-        if ($pageNumber > 1) {
-            for ($page = 2; $page<=$pageNumber; $page++) {
-                $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE, $filters);
-                $this->eachProperties($propertyData['data']);
+            if ($pageNumber > 1) {
+                for ($page = 2; $page<=$pageNumber; $page++) {
+                    $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE, $filters);
+                    $this->eachProperties($propertyData['data']);
+                }
             }
         }
     }
@@ -189,20 +185,21 @@ class UpdateTables extends Command
             ->first();
 
         $attributes = $property['attributes'];
+
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
+
+        if (!empty($attributes['discarded-at'])) {
+            if (!empty($propertyModel)) {
+                $propertyModel->delete();
+            }
+            return;
+        }
 
         if (empty($propertyModel)) {
             $propertyModel = new Properties;
             $propertyModel->id = $property['id'];
             $propertyModel->created_at = $now;
         } else {
-            if (!empty($attributes['discarded-at'])) {
-                $propertyModel->delete();
-                return;
-            }
-
-//            $updatedAt = Carbon::parse($attributes['updated-at'])->format('Y-m-d H:i:s');
-
             if ($propertyModel->updated_at == $now) {
                 return;
             }
@@ -210,6 +207,12 @@ class UpdateTables extends Command
 
         $propertyModel->updated_at = $now;
         $propertyModel->customs = json_encode($attributes['customs']);
+
+        $type = array_values(array_diff(array_map('trim', $attributes['customs']['custom-62518']), ['']));
+
+        if (isset($type[0])) {
+            $propertyModel->type = $this->getProperty($type[0]);
+        }
 
         unset($attributes['customs']);
 
@@ -222,5 +225,17 @@ class UpdateTables extends Command
 
         $propertyModel->relationships = json_encode($relationships);
         $propertyModel->save();
+    }
+
+    protected function getProperty($str)
+    {
+        switch($str) {
+            case 'Аренда':
+                return 1;
+            case 'Продажа':
+                return 2;
+            default:
+                return null;
+        }
     }
 }
