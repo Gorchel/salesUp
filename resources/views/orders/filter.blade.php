@@ -8,8 +8,8 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <select name="object_type" id="object_type" class="form-control">
-                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>
-                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>
+{{--                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>--}}
+{{--                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>--}}
                         <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
                         <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Сниму</option>
                     </select>

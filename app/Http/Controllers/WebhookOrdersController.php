@@ -98,6 +98,7 @@ class WebhookOrdersController extends Controller
 
         $handler = new SalesupHandler($token);
         $methods = $handler->methods;
+
         $order = $methods->getOrder($id);
         $orderCustoms = $order['attributes']['customs'];
 
@@ -318,13 +319,13 @@ class WebhookOrdersController extends Controller
         switch ($object_type) {
             case 1:
             case 2:
-                $stage = 32747;
+                $stage = 32745;
                 break;
             case 3:
-                $stage = 32746;
+                $stage = 32747;
                 break;
             default:
-                $stage = 32747;
+                $stage = 32746;
         }
 
         $data = [
