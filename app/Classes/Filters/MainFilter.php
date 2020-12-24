@@ -50,11 +50,11 @@ class MainFilter
 
         $sliderData = $this->getSliderOrderData($object_type, $orderCustoms);
 
-        if (!empty($sliderData['footage'])) {
+        if (isset($data['footage']) && !empty($sliderData['footage'])) {
             $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);;
         }
 
-        if (!empty($sliderData['budget_volume'])) {
+        if (isset($data['budget_volume']) && !empty($sliderData['budget_volume'])) {
             $budget_volume = $this->getArrayByPercent($sliderData['budget_volume'], 'budget_volume', $data);
 
             if (!empty($budget_volume)) {
@@ -64,7 +64,7 @@ class MainFilter
             }
         }
 
-        if (!empty($sliderData['budget_footage'])) {
+        if (isset($data['budget_footage']) && !empty($sliderData['budget_footage'])) {
             $budget_volume = $this->getArrayByPercent($sliderData['budget_footage'], 'budget_footage', $data);
 
             if (!empty($budget_volume)) {
