@@ -88,14 +88,15 @@ class WebhookOrdersController extends Controller
         Log::info(json_encode($request->all()));
 
         $id = $request->get('ids')[0];
-        $token = $request->get('token');
+//        $token = $request->get('token');
+        $token = env('API_TOKEN');
         $type = $request->get('type');
         $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 1;
         $cityTypeId = $request->has('city_type') ? $request->get('city_type') : 1;
 
         $filterOrdersClass = new FilterOrders;
 
-        $handler = new SalesupHandler($request->get('token'));
+        $handler = new SalesupHandler($token);
         $methods = $handler->methods;
         $order = $methods->getOrder($id);
         $orderCustoms = $order['attributes']['customs'];
