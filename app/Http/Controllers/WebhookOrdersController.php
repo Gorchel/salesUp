@@ -255,8 +255,8 @@ class WebhookOrdersController extends Controller
         $companies = [];
         $contacts = [];
 
-        foreach ($filterOrders as $order) {
-            $relationships = json_decode($order['relationships'], true);
+        foreach ($filterOrders as $filterOrder) {
+            $relationships = json_decode($filterOrder['relationships'], true);
 
             //Компании
             if (!empty($relationships['companies']['data'])) {
