@@ -237,10 +237,10 @@ class WebhookOrdersController extends Controller
                 ->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData, $object_type) {
                 foreach ($properties as $property) {
                     $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $cityTypeId, $object_type);
-                }
 
-                if (!empty($orderResponse)) {
-                    $filterOrders[] = $property;
+                    if (!empty($orderResponse)) {
+                        $filterOrders[] = $property;
+                    }
                 }
             });
 
@@ -249,7 +249,6 @@ class WebhookOrdersController extends Controller
                 return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
         }
-
 //        dd($filterOrders);
 
         //прописываем связи
@@ -283,6 +282,11 @@ class WebhookOrdersController extends Controller
                     'id' => $order['id'],
                 ];
             }
+        } else {
+            $orderData[] = [
+                'type' => 'orders',
+                'id' => $order['id'],
+            ];
         }
 
         //Проверяем компании
