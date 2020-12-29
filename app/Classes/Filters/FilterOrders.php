@@ -126,7 +126,7 @@ class FilterOrders
             'address' => 'custom-65154',
             'is_landlord_check' => 'custom-61757',
         ],
-        4 => [//Аренда
+        4 => [//cybve
             'budget_volume' => 'custom-61758',
             'budget_footage' => 'custom-61759',
             'payback_period' => 'custom-61718',
@@ -343,6 +343,7 @@ class FilterOrders
             $value = intval($attributes['total-area']);
             if (!empty($value)) {
                 $mainChecker = 1;
+
                 $crossInterval = $this->crossingIntervalByValue($value, $objData['footage'][0], $objData['footage'][1]);
 
                 if (empty($crossInterval)) {
@@ -375,8 +376,6 @@ class FilterOrders
                 return false;
             }
         }
-
-
 
         //район
         foreach (['district'] as $key) {
@@ -411,11 +410,11 @@ class FilterOrders
 
             foreach ($objectValue as $objVal) {//Поиск по полю в заявке
                 foreach ($valueArray as $value) {//Значение в фильтре
-                    if (empty($keyEl)) {
+                    if (empty($value)) {
                         continue;
                     }
 
-                    if (strpos($objVal, $value) === false) {
+                    if (strpos($objVal, $value) !== false) {
                         $checker = 1;
                     }
                 }
@@ -459,11 +458,11 @@ class FilterOrders
 
             foreach ($objectValue as $objVal) {//Поиск по полю в заявке
                 foreach ($valueArray as $value) {//Значение в фильтре
-                    if (empty($keyEl)) {
+                    if (empty($value)) {
                         continue;
                     }
 
-                    if (strpos($objVal, $value) === false) {
+                    if (strpos($objVal, $value) !== false) {
                         $checker = 1;
                     }
                 }
