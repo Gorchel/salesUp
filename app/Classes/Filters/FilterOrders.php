@@ -123,7 +123,7 @@ class FilterOrders
             'type_of_activity' => 'custom-61774',
             'metro' => 'custom-65155',
             'district' => 'custom-65154',
-            'address' => 'custom-65154',
+//            'address' => 'custom-65154',
             'is_landlord_check' => 'custom-61757',
         ],
         4 => [//cybve
@@ -134,7 +134,7 @@ class FilterOrders
             'type_of_activity' => 'custom-61774',
             'metro' => 'custom-65155',
             'district' => 'custom-65154',
-            'address' => 'custom-65154',
+//            'address' => 'custom-65154',
             'is_landlord_check' => 'custom-61757',
         ]
     ];
@@ -433,23 +433,14 @@ class FilterOrders
 
             $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
 
-            if (!isset( $customFields[$key])) {
+            if (empty($valueArray)) {//Если пустое значение поля
                 continue;
             }
 
-            $customArray = $attributes['address'];//Значения в поле
-
-            //проверяем по городам
             $checker = 0;
-
-            //Проверяем наличие
-            if (!isset($customs[$customArray])) {
-                continue;
-            }
-
             $mainChecker = 1;
 
-            $objectValue = $customs[$customArray];//Значение в заявке
+            $objectValue = array_map('trim', explode(',',trim(mb_strtolower($attributes['address']))));//Значение в поле
             $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
 
             if (empty($objectValue)) {
