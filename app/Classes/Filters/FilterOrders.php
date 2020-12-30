@@ -124,7 +124,7 @@ class FilterOrders
             'metro' => 'custom-65155',
             'district' => 'custom-65154',
 //            'address' => 'custom-65154',
-            'is_landlord_check' => 'custom-61757',
+            'is_landlord' => 'custom-61757',
         ],
         4 => [//cybve
             'budget_volume' => 'custom-61758',
@@ -135,7 +135,7 @@ class FilterOrders
             'metro' => 'custom-65155',
             'district' => 'custom-65154',
 //            'address' => 'custom-65154',
-            'is_landlord_check' => 'custom-61757',
+            'is_landlord' => 'custom-61757',
         ]
     ];
 
@@ -324,7 +324,7 @@ class FilterOrders
         $mainChecker = 0;
 
         //Тип недвижимости / Адресная программа / тип клиента / вид деятельности
-        foreach (['type_of_property','type_of_activity','metro','is_landlord_check'] as $key) {
+        foreach (['type_of_property','type_of_activity','metro'] as $key) {
             if (!empty($objData[$key])) {
                 $ordersValues = array_diff($this->getValue($key, $customs, $customFields), ['']);
 
@@ -335,6 +335,22 @@ class FilterOrders
                         return false;
                     }
                 }
+            }
+        }
+
+        //проверка есть ли арендатор
+        if (!empty($objData['is_landlord'])) {
+            $value = trim($objData['is_landlord']);
+
+            $ordersValues = array_diff($this->getValue('is_landlord', $customs, $customFields), ['']);
+//            dd($ordersValues);
+            if (!empty($ordersValues)) {
+                $mainChecker = 1;
+
+                if (!in_array($value, $ordersValues)) {
+                    return false;
+                }
+//                dd($ordersValues);
             }
         }
 

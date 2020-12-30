@@ -249,7 +249,6 @@ class WebhookOrdersController extends Controller
                 return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
         }
-//        dd($filterOrders);
 
         //прописываем связи
         $companies = [];
