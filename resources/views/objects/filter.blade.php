@@ -8,10 +8,10 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <select name="object_type" id="object_type" class="form-control">
-                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сниму</option>
+                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>
                         <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>
-{{--                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Сдам</option>--}}
-{{--                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>--}}
+                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
+                        <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Сниму</option>
 
                     </select>
                 </div>
@@ -29,7 +29,7 @@
                     </select>
                 </div>
             </div>
-            @if (in_array($objectType, [1]))
+            @if ($objectType != 2)
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
@@ -52,6 +52,8 @@
                         </select>
                     </div>
                 </div>
+            @endif
+            @if ($objectType == 1))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
@@ -88,59 +90,71 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
+            @if (!empty($objectSlider['footage']))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1" checked="checked">
+                                    <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
+                                </div>
+                                <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                             </div>
-                            <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="0">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" name="footage_value_input" data-value="{{intval($objectSlider['footage'])}}" value="{{number_format(intval($objectSlider['footage']),0,' ',' ')}}" readonly="readonly">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="0">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
-                                <label class="custom-control-label" for="customCheckTwo">По бюджету, руб.мес</label>
-                            </div>
-                            <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="0">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control" name="budget_volume_value_input" data-value="{{intval($objectSlider['budget_volume'])}}" value="{{number_format(intval($objectSlider['budget_volume']),0,' ',' ')}}" readonly="readonly">
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="0">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="0">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="footage_value_input" data-value="{{intval($objectSlider['footage'])}}" value="{{number_format(intval($objectSlider['footage']),0,' ',' ')}}" readonly="readonly">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            @if (in_array($objectType, [1]))
+            @else
+                <div class="row hidden">
+                    <input id="footage" type="hidden" class="btm-color" value="" style="width: 80%;"/>&nbsp;<b></b>
+                </div>
+            @endif
+            @if (!empty($objectSlider['budget_volume']))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
+                                    <label class="custom-control-label" for="customCheckTwo">По бюджету, руб.мес</label>
+                                </div>
+                                <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="0">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control" name="budget_volume_value_input" data-value="{{intval($objectSlider['budget_volume'])}}" value="{{number_format(intval($objectSlider['budget_volume']),0,' ',' ')}}" readonly="readonly">
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="row hidden">
+                    <input id="budget_volume" type="hidden" class="btm-color" value="" style="width: 80%;"/>&nbsp;<b></b>
+                </div>
+            @endif
+            @if (in_array($objectType, [1, 4]) && !empty($objectSlider['budget_volume']))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="row">
@@ -172,15 +186,6 @@
                     <input id="budget_footage" type="hidden" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
                 </div>
             @endif
-{{--            <div class="row">--}}
-{{--                <div class="col-lg-10 offset-lg-1 form-group">--}}
-{{--                    <div class="custom-control custom-checkbox">--}}
-{{--                        <input type="checkbox" class="custom-control-input" id="notCompanyCheck" name="disabled_company_check" value="1" checked="checked">--}}
-{{--                        <label class="custom-control-label" for="notCompanyCheck">Не предлагать компаниям</label>--}}
-{{--                    </div>--}}
-{{--                    <input type="text" class="form-control input-sm" name="disabled_company" value="{{$disabledCompanies}}">--}}
-{{--                </div>--}}
-{{--            </div>--}}
             @if (in_array($objectType, [2,3]))
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
@@ -214,18 +219,20 @@
                 </div>
             @endif
 
-            <div class="row">
-                <div class="col-lg-10 offset-lg-1 form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1" checked="checked">
-                        <label class="custom-control-label" for="client_type_check">Клиент</label>
+            @if (in_array($objectType, [1,2]))
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1 form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1" checked="checked">
+                            <label class="custom-control-label" for="client_type_check">Клиент</label>
+                        </div>
+                        <select name="client_type" id="client_type" class="form-control">
+                            <option value="сетевой">сетевой</option>
+                            <option value="не сетевой">не сетевой</option>
+                        </select>
                     </div>
-                    <select name="client_type" id="client_type" class="form-control">
-                        <option value="сетевой">сетевой</option>
-                        <option value="не сетевой">не сетевой</option>
-                    </select>
                 </div>
-            </div>
+            @endif
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group text-center">
                     <input type="submit" class="btn btn-success" id="submit" value="Создать сделку">

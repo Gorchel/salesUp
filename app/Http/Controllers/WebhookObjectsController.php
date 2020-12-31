@@ -104,7 +104,7 @@ class WebhookObjectsController extends Controller
         Log::info(json_encode($request->all()));
 
         $id = $request->get('ids')[0];
-        $token = $request->get('token');
+        $token = env('API_TOKEN');
         $type = $request->get('type');
 
         $handler = new SalesupHandler($request->get('token'));
@@ -115,18 +115,12 @@ class WebhookObjectsController extends Controller
 
         $objectType = $request->has('object_type') ? $request->get('object_type') : 1;
 
-        if (in_array($objectType, [1,2])) {
-            $objectTypeId = 1;
-        } else {
-            $objectTypeId = 2;
-        }
-
         $filterClass = new MainFilter();
 
         //Конфиги
         $metroSelect = config('metro')[$filterClass->checkCity($address)];//Метро по городу
         $companyTypes = config('company_types');//Вид деятельности
-        $typeOfProperties = config('type_of_property');//Тип недвижимости
+        $typeOfProperties = config('type_of_property')[$objectType];//Тип недвижимости
 
         //Подготовка значений
         $metro = trim(mb_strtolower($object['attributes']['subway-name']));//Метро
