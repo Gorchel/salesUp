@@ -114,6 +114,9 @@ class FilterOrders
         ],
     ];
 
+    /**
+     * @var array
+     */
     protected $customPropertyFields = [
         3 => [//Куплю
             'budget_volume' => 'custom-61706',
@@ -126,7 +129,7 @@ class FilterOrders
 //            'address' => 'custom-65154',
             'is_landlord' => 'custom-61757',
         ],
-        4 => [//cybve
+        4 => [//сниму
             'budget_volume' => 'custom-61758',
             'budget_footage' => 'custom-61759',
             'payback_period' => 'custom-61718',
@@ -511,6 +514,20 @@ class FilterOrders
     {
         if (isset($this->customFields[$type][$field])) {
             return $this->customFields[$type][$field];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $type
+     * @param $field
+     * @return mixed|null
+     */
+    public function getCustomPropertyArray($type)
+    {
+        if (isset($this->customPropertyFields[$type])) {
+            return $this->customPropertyFields[$type];
         }
 
         return null;

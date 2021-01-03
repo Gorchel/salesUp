@@ -186,12 +186,11 @@ class WebhookObjectsController extends Controller
 
         $object = $methods->getObject($request->get('id'));
         $address = $object['attributes']['address'];
+        $object_type = $request->get('object_type');
         $typeOfObject = $filterClass->checkCity($address);
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request, $object);
-
-        dd($objData);
+        $objData = $filterClass->prepareData($request, $object, 'object', $object_type);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";

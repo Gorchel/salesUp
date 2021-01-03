@@ -36,7 +36,7 @@ class MainFilter
     /**
      * @return array
      */
-    public function prepareData(Request $request, $order, $type = "object", $object_type = null)
+    public function prepareData(Request $request, $order, $type = "order", $object_type = null)
     {
         $data = [];
 
@@ -48,10 +48,14 @@ class MainFilter
 
         $orderCustoms = $order['attributes']['customs'];
 
-        $sliderData = $this->getSliderOrderData($object_type, $orderCustoms);
+        $sliderData = $this->getSliderOrderData($object_type, $orderCustoms, $type, $order);
 
-        if (isset($data['footage']) && !empty($sliderData['footage'])) {
-            $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);;
+        if (isset($data['footage'])) {
+            if (($object_type == 'order') && !empty($sliderData['footage'])) {
+                $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);
+            } else {
+                $data['footage'] = $this->getArrayByPercent($order['attributes']['total-area'], 'footage', $data);
+            }
         }
 
         if (isset($data['budget_volume']) && !empty($sliderData['budget_volume'])) {
@@ -74,54 +78,6 @@ class MainFilter
             }
         }
 
-//        if ($type == 'object') {
-//            if (isset($data['footage'])) {
-//                $data['footage'] = $this->getArrayByPercent($object['attributes']['total-area'], 'footage', $data);;
-//            }
-//
-//            foreach ($this->objectFields as $key => $field) {
-//                if (isset($data[$key])) {
-//                    $data[$key] = $this->getArrayByPercent($object['attributes']['customs'][$field], $key, $data);
-//                }
-//            }
-//        } else {
-//            $filterOrdersClass = new FilterOrders;
-//
-//            if (isset($data['footage'])) {
-//                $footage = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'footage')], 'footage', $data);
-//
-//                if (!empty($footage)) {
-//                    $data['footage'] = $footage;
-//                } else {
-//                    $data['footage'] = null;
-//                }
-//            }
-//
-//            if (isset($data['budget_volume'])) {
-//                $budget_volume = $this->getArrayByPercent($object['attributes']['customs'][$filterOrdersClass->getCustomArray($object_type, 'budget_volume')], 'budget_volume', $data);
-//
-//                if (!empty($budget_volume)) {
-//                    $data['budget_volume'] = $budget_volume;
-//                } else {
-//                    $data['budget_volume'] = null;
-//                }
-//            }
-//
-//            if (isset($data['budget_footage'])) {
-//                $key = $filterOrdersClass->getCustomArray($object_type, 'budget_footage');
-//
-//                if (!empty($key)) {
-//                    $budget_footage = $this->getArrayByPercent($object['attributes']['customs'][$key], 'budget_footage', $data);
-//
-//                    if (!empty($budget_footage)) {
-//                        $data['budget_footage'] = $budget_footage;
-//                    } else {
-//                        $data['budget_footage'] = null;
-//                    }
-//                }
-//            }
-//        }
-
         if (isset($data['payback_period'])) {
             $data['payback_period'] = explode(',', $data['payback_period']);
         }
@@ -129,33 +85,50 @@ class MainFilter
         return $data;
     }
 
-    public function getSliderOrderData($objectTypeId, $orderCustoms)
+    public function getSliderOrderData($objectTypeId, $orderCustoms, $type = 'order', $order = null)
     {
         $objectSlider = [];
 
         $filterOrdersClass = new FilterOrders;
-        $ranges = $filterOrdersClass->getCustomArray($objectTypeId, 'ranges');
 
-        foreach (['footage', 'budget_volume', 'budget_footage'] as $key) {
-            if (isset($ranges[$key])) {
-                if (isset($ranges[$key]['value']) && !empty($ranges[$key]['value'])) {
-                    $keyValue = $orderCustoms[$ranges[$key]['value']];
+        if ($type == 'order') {
+            $ranges = $filterOrdersClass->getCustomArray($objectTypeId, 'ranges');
 
-                    if (!empty($keyValue)) {
-                        $objectSlider[$key] = $keyValue;
-                    }
-                } else {
-                    $from = (int) $orderCustoms[$ranges[$key]['from']];
-                    $to = (int) $orderCustoms[$ranges[$key]['to']];
+            foreach (['footage', 'budget_volume', 'budget_footage'] as $key) {
+                if (isset($ranges[$key])) {
+                    if (isset($ranges[$key]['value']) && !empty($ranges[$key]['value'])) {
+                        $keyValue = $orderCustoms[$ranges[$key]['value']];
 
-                    $value = ($from + $to) / 2;
+                        if (!empty($keyValue)) {
+                            $objectSlider[$key] = $keyValue;
+                        }
+                    } else {
+                        $from = (int) $orderCustoms[$ranges[$key]['from']];
+                        $to = (int) $orderCustoms[$ranges[$key]['to']];
 
-                    if (!empty($value)) {
-                        $objectSlider[$key] = $value;
+                        $value = ($from + $to) / 2;
+
+                        if (!empty($value)) {
+                            $objectSlider[$key] = $value;
+                        }
                     }
                 }
+            }//Слайдеры
+        } else {
+            if ($objectTypeId == 1) {
+                $objectTypeId = 4;
+            } else if ($objectTypeId == 2) {
+                $objectTypeId = 3;
             }
-        }//Слайдеры
+
+            $ranges = $filterOrdersClass->getCustomPropertyArray($objectTypeId);
+
+            foreach (['budget_volume', 'budget_footage'] as $key) {
+                if (isset($ranges[$key])) {
+                    $objectSlider[$key] = $orderCustoms[$ranges[$key]];
+                }
+            }
+        }
 
         return $objectSlider;
     }

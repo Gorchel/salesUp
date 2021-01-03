@@ -88,7 +88,6 @@ class WebhookOrdersController extends Controller
         Log::info(json_encode($request->all()));
 
         $id = $request->get('ids')[0];
-//        $token = $request->get('token');
         $token = env('API_TOKEN');
         $type = $request->get('type');
         $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 1;
@@ -102,7 +101,6 @@ class WebhookOrdersController extends Controller
         $order = $methods->getOrder($id);
         $orderCustoms = $order['attributes']['customs'];
 
-//        $address = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'address')];
         $filterClass = new MainFilter();
 //
 //        //Конфиги
@@ -110,27 +108,7 @@ class WebhookOrdersController extends Controller
         $companyTypes = config('company_types');//Вид деятельности
         $typeOfProperties = config('type_of_property')[$objectTypeId];//Тип недвижимости
 
-//        $city = $filterOrdersClass->getCustomArray($objectTypeId, 'city');
-
-//        $metro = $orderCustoms[$city['metro'][$filterClass->checkCity($address)]];
-
-////        $disabledCompanies = strip_tags(str_replace('&nbsp;','',$object['attributes']['customs'][$this->disabledCompaniesNameField]));//Не предлагать компаниям
-//
-//        $districtArray = explode(',', str_replace('район','', $object['attributes']['district']));
-//        $districtArray = array_map('trim', $districtArray);//Район
-//
-//        $addressArray = explode(',', str_replace('пр-кт','', $address));//Адрес
-//        $addressArray = array_map('trim', $addressArray);
-
-//        if (count($addressArray) == 3) {
-//            $address = $addressArray[1].' '.$addressArray[2];
-//        } else if (count($addressArray) == 4) {
-//            $address = $addressArray[2].' '.$addressArray[3];
-//        } else {
-//            $address = implode(' ', $addressArray);
-//        }//Адрес
-
-        $type_of_activity = $filterOrdersClass->getCustomArray($objectTypeId, 'type_of_activity');
+//        $type_of_activity = $filterOrdersClass->getCustomArray($objectTypeId, 'type_of_activity');
         $profileCompanies = [];
 
 //        if (!empty($type_of_activity)) {
@@ -139,17 +117,6 @@ class WebhookOrdersController extends Controller
 
 //
         $objectSlider = $filterClass->getSliderOrderData($objectTypeId, $orderCustoms);
-
-        //Вид деятельности
-//        $typeOfPropertyObj = $orderCustoms[$filterOrdersClass->getCustomArray($objectTypeId, 'type_of_property')];
-
-        //Срок окупаемости
-//        $objectSlider['payback_period'] = 16;
-//        $payback_period = $filterOrdersClass->getCustomArray($objectTypeId, 'payback_period');
-//
-//        if (isset($payback_period) && !empty($orderCustoms[$payback_period])) {
-//            $objectSlider['payback_period'] = $orderCustoms[$payback_period];
-//        }
 
         $districtArray = [];
         $regionArray = [];
@@ -170,7 +137,6 @@ class WebhookOrdersController extends Controller
             'metroSelect' => $metroSelect,
             'objectTypes' => $companyTypes,
             'typeOfProperties' => $typeOfProperties,
-//            'attributes' => $object['attributes'],
             'metro' => [],
             'districtArray' => $districtArray,
             'regionArray' => $regionArray,
@@ -196,7 +162,7 @@ class WebhookOrdersController extends Controller
         $methods = $handler->methods;
 
         $object_type = $request->get('object_type');
-        $cityTypeId = $request->get('$cityTypeId');
+        $cityTypeId = $request->get('cityTypeId');
 
         $filterClass = new MainFilter;
         $filterOrdersClass = new FilterOrders;
