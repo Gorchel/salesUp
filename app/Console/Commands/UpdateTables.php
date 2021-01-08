@@ -22,7 +22,7 @@ class UpdateTables extends Command
      *
      * @var string
      */
-    protected $signature = 'update_tables:init {dayUpdated?}';
+    protected $signature = 'update_tables:init {dayUpdated?} {type = orders}';
 
     /**
      * The console command description.
@@ -53,6 +53,7 @@ class UpdateTables extends Command
         $methods = $handler->methods;
 
         $dayUpdated = $this->argument('dayUpdated');
+        $type = $this->argument('type');
         $filters = [];
 
         if (!empty($dayUpdated)) {
@@ -62,34 +63,36 @@ class UpdateTables extends Command
             $filters['updated-at-gte'] = $now->startOfDay()->format('Y.m.d H:s');
         }
 
-        //Получаем Список заявок
-        $ordersData = $methods->getOrders(1, self::COUNT_PER_PAGE, $filters);
+        if ($type == 'orders') {
+            //Получаем Список заявок
+            $ordersData = $methods->getOrders(1, self::COUNT_PER_PAGE, $filters);
 
-        if (!empty($ordersData['data'])) {
-            $this->eachOrders($ordersData['data']);
+            if (!empty($ordersData['data'])) {
+                $this->eachOrders($ordersData['data']);
 
-            $pageNumber = $ordersData['meta']['page-count'];
+                $pageNumber = $ordersData['meta']['page-count'];
 
-            if ($pageNumber > 1) {
-                for ($page = 2; $page<=$pageNumber; $page++) {
-                    $ordersData = $methods->getOrders($page, self::COUNT_PER_PAGE, $filters);
-                    $this->eachOrders($ordersData['data']);
+                if ($pageNumber > 1) {
+                    for ($page = 2; $page<=$pageNumber; $page++) {
+                        $ordersData = $methods->getOrders($page, self::COUNT_PER_PAGE, $filters);
+                        $this->eachOrders($ordersData['data']);
+                    }
                 }
             }
-        }
+        } else {
+            //Получаем Список недвижки
+            $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE, $filters);
 
-        //Получаем Список недвижки
-        $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE, $filters);
+            if (!empty($propertyData['data'])) {
+                $this->eachProperties($propertyData['data']);
 
-        if (!empty($propertyData['data'])) {
-            $this->eachProperties($propertyData['data']);
+                $pageNumber = $propertyData['meta']['page-count'];
 
-            $pageNumber = $propertyData['meta']['page-count'];
-
-            if ($pageNumber > 1) {
-                for ($page = 2; $page<=$pageNumber; $page++) {
-                    $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE, $filters);
-                    $this->eachProperties($propertyData['data']);
+                if ($pageNumber > 1) {
+                    for ($page = 2; $page<=$pageNumber; $page++) {
+                        $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE, $filters);
+                        $this->eachProperties($propertyData['data']);
+                    }
                 }
             }
         }
