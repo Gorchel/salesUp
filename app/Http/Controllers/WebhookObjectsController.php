@@ -219,39 +219,41 @@ class WebhookObjectsController extends Controller
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
-        dd($filterOrders);
-
         //прописываем связи
-        $orderData = [];
         $companies = [];
         $contacts = [];
+
+        foreach ($filterOrders as $filterOrder) {
+            $relationships = json_decode($filterOrder['relationships'], true);
+
+            //Компании
+            if (!empty($relationships['companies']['data'])) {
+                foreach ($relationships['companies']['data'] as $company) {
+                    $companies[$company['id']] = $company['id'];
+                }
+            }
+
+            //Контакты
+            if (!empty($relationships['contacts']['data'])) {
+                foreach ($relationships['contacts']['data'] as $contact) {
+                    $contacts[$contact['id']] = $contact['id'];
+                }
+            }
+        }
+
+        $orderData = [];
 
         foreach ($filterOrders as $order) {
             $orderData[] = [
                 'type' => 'orders',
                 'id' => $order['id'],
             ];
-
-            //Компании
-            if (!empty($order['relationships']['companies']['data'])) {
-                foreach ($order['relationships']['companies']['data'] as $company) {
-                    $companies[$company['id']] = $company['id'];
-                }
-            }
-
-            //Контакты
-            if (!empty($order['relationships']['contacts']['data'])) {
-                foreach ($order['relationships']['contacts']['data'] as $contact) {
-                    $contacts[$contact['id']] = $contact['id'];
-                }
-            }
         }
 
         //Проверяем компании
         $companiesData = [];
 
         if (!empty($companies)) {
-//            $filterCompanyClass = new FilterCompany;
             foreach ($companies as $companyId) {
                 $company = $methods->getCompany($companyId);
 
@@ -260,21 +262,6 @@ class WebhookObjectsController extends Controller
                         $contacts[$contact['id']] = $contact['id'];
                     }
                 }
-//                $filterResponse = $filterCompanyClass->filter($company, $objData);
-//
-//                if (empty($filterResponse)) {
-//                    unset($companies[$companyId]);
-//                    continue;
-//                }
-
-//                $response = $handler->getContactByCompany($company, $companyContacts, $additionalContactData);
-//
-//                if (!empty($response)) {
-//                    $companyData[] = [
-//                        'type' => 'companies',
-//                        'id' => $company['id'],
-//                    ];
-//                }
 
                 $companiesData[] = [
                     'type' => 'companies',
@@ -294,22 +281,22 @@ class WebhookObjectsController extends Controller
             }
         }
 
-        $typeOfDeal = array_values(array_diff($object['attributes']['customs'][$this->typeOfDealField],['']));
-        $dealStatuses = [];
-
-        if (!empty($typeOfDeal)) {
-            $typeOfDeal = $this->status2id[$typeOfDeal[0]];
-
-            $dealStatuses = [
-                'type' => 'deal-statuses',
-                'id' => $typeOfDeal,
-            ];
+        switch ($object_type) {
+            case 1:
+            case 2:
+                $stage = 32745;
+                break;
+            case 3:
+                $stage = 32747;
+                break;
+            default:
+                $stage = 32746;
         }
 
         $data = [
             'attributes' => [
                 'name' => 'Сделка по объекту',
-                'description' => $object['attributes']['name'],
+                'description' => $object['id'],
             ],
             'relationships' => [
                 'contacts' => [
@@ -321,19 +308,18 @@ class WebhookObjectsController extends Controller
                 'orders' => [
                     'data' => $orderData,
                 ],
-                'status' => [
-                    'data' => $dealStatuses,
-                ],
                 'stage-category' => [
                     'type' => 'stage-category',
-                    'id' => 32745,//Воронка постоянных клиентов
+                    'id' => $stage,//Воронка Аренда/Продажа
                 ],
             ],
         ];
 
         $dealResponse = $methods->dealCreate($data);
 
-        $objectResponse = $methods->attachDealToObject($dealResponse['id'], $object['id']);
+        foreach ($filterOrders as $order) {
+            $methods->attachDealToObject($dealResponse['id'], $object['id']);
+        }
 
         $viewData = [
             'deal' => $dealResponse,

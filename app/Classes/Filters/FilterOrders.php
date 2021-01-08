@@ -271,19 +271,30 @@ class FilterOrders
             }
 
             $mainChecker = 1;
-            dd($customFields);
+
             $ranges = $customFields['ranges'][$key];//from/to
 
-            $from = intval($customs[$ranges['from']]);
-            $to = intval($customs[$ranges['to']]);
+            if (isset($ranges['value'])) {
+                $value = intval($customs[$ranges['value']]);
 
-            //Корректировка тысяч
-            if ($key == 'budget_volume') {
-                $from = $from * 1000;
-                $to = $to * 1000;
+                //Корректировка тысяч
+                if ($key == 'budget_volume') {
+                    $value = $value * 1000;
+                }
+
+                $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
+            } else {
+                $from = intval($customs[$ranges['from']]);
+                $to = intval($customs[$ranges['to']]);
+
+                //Корректировка тысяч
+                if ($key == 'budget_volume') {
+                    $from = $from * 1000;
+                    $to = $to * 1000;
+                }
+
+                $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
             }
-
-            $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
 
             if (empty($crossInterval)) {
                 return false;
