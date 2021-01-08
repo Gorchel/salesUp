@@ -22,7 +22,7 @@ class UpdateTables extends Command
      *
      * @var string
      */
-    protected $signature = 'update_tables:init {dayUpdated?} {type = orders}';
+    protected $signature = 'update_tables:init {type} {dayUpdated?}';
 
     /**
      * The console command description.
