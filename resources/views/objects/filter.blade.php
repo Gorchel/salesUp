@@ -53,7 +53,7 @@
                     </div>
                 </div>
             @endif
-            @if ($objectType == 1))
+            @if ($objectType == 1)
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">

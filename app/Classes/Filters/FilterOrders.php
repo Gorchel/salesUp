@@ -271,7 +271,7 @@ class FilterOrders
             }
 
             $mainChecker = 1;
-
+            dd($customFields);
             $ranges = $customFields['ranges'][$key];//from/to
 
             $from = intval($customs[$ranges['from']]);

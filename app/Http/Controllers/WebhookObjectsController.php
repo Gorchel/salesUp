@@ -107,7 +107,7 @@ class WebhookObjectsController extends Controller
         $token = env('API_TOKEN');
         $type = $request->get('type');
 
-        $handler = new SalesupHandler($request->get('token'));
+        $handler = new SalesupHandler($token);
         $methods = $handler->methods;
         $object = $methods->getObject($id);
 
@@ -203,38 +203,20 @@ class WebhookObjectsController extends Controller
         $filterOrdersClass = new FilterOrders;
         $filterOrders = [];
 
-        if (in_array($request->get('object_type'), [1,2])) {
-            //Получаем Список заявок
-            Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
-                foreach ($orders as $order) {
-                    $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
-                }
-
-                if (!empty($orderResponse)) {
-                    $filterOrders[] = $order;
-                }
-            });
-
-            if (empty($filterOrders)) {
-                $msg = "Заявки не найдены";
-                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+        //Получаем Список заявок
+        Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
+            foreach ($orders as $order) {
+                $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
             }
-        } else {
-            //Получаем Список заявок
-            Properties::query()->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
-                foreach ($properties as $property) {
-                    $orderResponse = $filterOrdersClass->filter($property, $objData, $typeOfObject);
-                }
 
-                if (!empty($orderResponse)) {
-                    $filterOrders[] = $property;
-                }
-            });
-
-            if (empty($filterOrders)) {
-                $msg = "Обйекты недвижимости не найдены";
-                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
+            if (!empty($orderResponse)) {
+                $filterOrders[] = $order;
             }
+        });
+
+        if (empty($filterOrders)) {
+            $msg = "Заявки не найдены";
+            return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
         dd($filterOrders);
