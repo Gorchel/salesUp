@@ -81,7 +81,7 @@ class FilterOrders
             ],
         ],
         3 => [//куплю
-            'type_of_property' => 'custom-61755',
+            'type_of_property' => 'custom-67879',
             'address' => 'custom-67827',
             'ranges' => [
                 'footage' => [
@@ -95,8 +95,7 @@ class FilterOrders
             ],
         ],
         4 => [//сниму
-            'type_of_property' => 'custom-61755',
-            'address' => 'custom-67827',
+            'type_of_property' => 'custom-67902',
             'ranges' => [
                 'footage' => [
                     'from' => 'custom-67904',
