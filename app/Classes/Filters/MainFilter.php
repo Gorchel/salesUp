@@ -50,7 +50,7 @@ class MainFilter
 
         $sliderData = $this->getSliderOrderData($object_type, $orderCustoms, $type, $order);
 
-        if (isset($data['footage'])) {
+        if (isset($sliderData['footage'])) {
             if (($object_type == 'order') && !empty($sliderData['footage'])) {
                 $data['footage'] = $this->getArrayByPercent($order['attributes']['total-area'], 'footage', $data);
             } else {
@@ -58,7 +58,7 @@ class MainFilter
             }
         }
 
-        if (isset($data['budget_volume']) && !empty($sliderData['budget_volume'])) {
+        if (isset($sliderData['budget_volume']) && !empty($sliderData['budget_volume'])) {
             $budget_volume = $this->getArrayByPercent($sliderData['budget_volume'], 'budget_volume', $data);
 
             if (!empty($budget_volume)) {
@@ -68,7 +68,7 @@ class MainFilter
             }
         }
 
-        if (isset($data['budget_footage']) && !empty($sliderData['budget_footage'])) {
+        if (isset($sliderData['budget_footage']) && !empty($sliderData['budget_footage'])) {
             $budget_volume = $this->getArrayByPercent($sliderData['budget_footage'], 'budget_footage', $data);
 
             if (!empty($budget_volume)) {
@@ -78,8 +78,8 @@ class MainFilter
             }
         }
 
-        if (isset($data['payback_period'])) {
-            $data['payback_period'] = explode(',', $data['payback_period']);
+        if (isset($sliderData['payback_period'])) {
+            $data['payback_period'] = explode(',', $sliderData['payback_period']);
         }
 
         return $data;
