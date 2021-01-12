@@ -52,9 +52,9 @@ class MainFilter
 
         if (isset($data['footage'])) {
             if (($object_type == 'order') && !empty($sliderData['footage'])) {
-                $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);
-            } else {
                 $data['footage'] = $this->getArrayByPercent($order['attributes']['total-area'], 'footage', $data);
+            } else {
+                $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);
             }
         }
 
