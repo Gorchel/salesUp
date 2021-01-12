@@ -72,7 +72,7 @@ class MainFilter
             }
         }
 
-        if (isset($sliderData['budget_footage']) && !empty($sliderData['budget_footage'])) {
+        if (isset($data['budget_footage']) && !empty($sliderData['budget_footage'])) {
             $budget_volume = $this->getArrayByPercent($sliderData['budget_footage'], 'budget_footage', $data);
 
             if (!empty($budget_volume)) {
