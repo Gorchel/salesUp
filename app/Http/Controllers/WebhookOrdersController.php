@@ -186,10 +186,10 @@ class WebhookOrdersController extends Controller
                 ->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
                     foreach ($orders as $order) {
                         $orderResponse = $filterOrdersClass->filter($order, $objData, $cityTypeId);
-                    }
 
-                    if (!empty($orderResponse)) {
-                        $filterOrders[] = $order;
+                        if (!empty($orderResponse)) {
+                            $filterOrders[] = $order;
+                        }
                     }
                 });
 

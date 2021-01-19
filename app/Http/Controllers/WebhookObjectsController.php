@@ -204,15 +204,16 @@ class WebhookObjectsController extends Controller
         $filterOrders = [];
 
         //Получаем Список заявок
-        Orders::query()->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData) {
-            foreach ($orders as $order) {
-                $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
-            }
+        Orders::query()->where('type', $object_type)
+            ->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $typeOfObject, $objData, &$count) {
+                foreach ($orders as $order) {
+                    $orderResponse = $filterOrdersClass->filter($order, $objData, $typeOfObject);
 
-            if (!empty($orderResponse)) {
-                $filterOrders[] = $order;
-            }
-        });
+                    if (!empty($orderResponse)) {
+                        $filterOrders[] = $order;
+                    }
+                }
+            });
 
         if (empty($filterOrders)) {
             $msg = "Заявки не найдены";
