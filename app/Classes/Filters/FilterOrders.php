@@ -18,20 +18,20 @@ class FilterOrders
         1 => [//сдам
             'type_of_property' => 'custom-67826',
             'address' => 'custom-67827',
-            'city' => [
-                'street' => [
-                    1 => ['custom' => 'custom-67921', 'type' => 'str'],//msk
-                    2 => ['custom' => 'custom-67916', 'type' => 'str'],//spb
-                ],
-                'district' => [
-                    1 => ['custom' => 'custom-67942', 'type' => 'array'],//msk
-                    2 => ['custom' => 'custom-67941', 'type' => 'array'],//spb
-                ],
-                'metro' => [
-                    1 => 'custom-67940',//msk
-                    2 => 'custom-67939',//spb
-                ],
-            ],
+//            'city' => [
+//                'street' => [
+//                    1 => ['custom' => 'custom-67921', 'type' => 'str'],//msk
+//                    2 => ['custom' => 'custom-67916', 'type' => 'str'],//spb
+//                ],
+//                'district' => [
+//                    1 => ['custom' => 'custom-67942', 'type' => 'array'],//msk
+//                    2 => ['custom' => 'custom-67941', 'type' => 'array'],//spb
+//                ],
+//                'metro' => [
+//                    1 => 'custom-67940',//msk
+//                    2 => 'custom-67939',//spb
+//                ],
+//            ],
             'address_program' => 'custom-67911',
             'client_type' => 'custom-67822',
             'type_of_activity' => 'custom-67947',
@@ -51,16 +51,16 @@ class FilterOrders
         2 => [//продам
             'type_of_property' => 'custom-67849',
             'address' => 'custom-67850',
-            'city' => [
-                'district' => [
-                    1 => ['custom' => 'custom-67945', 'type' => 'array'],//msk
-                    2 => ['custom' => 'custom-67943', 'type' => 'array'],//spb
-                ],
-                'metro' => [
-                    1 => 'custom-67946',//msk
-                    2 => 'custom-67944',//spb
-                ],
-            ],
+//            'city' => [
+//                'district' => [
+//                    1 => ['custom' => 'custom-67945', 'type' => 'array'],//msk
+//                    2 => ['custom' => 'custom-67943', 'type' => 'array'],//spb
+//                ],
+//                'metro' => [
+//                    1 => 'custom-67946',//msk
+//                    2 => 'custom-67944',//spb
+//                ],
+//            ],
             'address_program' => 'custom-67911',
             'client_type' => 'custom-67822',
             'footage' => 'custom-67851',
@@ -93,6 +93,16 @@ class FilterOrders
                     'to' => 'custom-67881'
                 ],// По бюджету, руб.мес.  в диапазоне от до
             ],
+            'city' => [
+                'district' => [
+                    1 => ['custom' => 'custom-67945', 'type' => 'array'],//msk
+                    2 => ['custom' => 'custom-67943', 'type' => 'array'],//spb
+                ],
+                'metro' => [
+                    1 => ['custom' => 'custom-67946', 'type' => 'array'],//msk
+                    2 => ['custom' => 'custom-67944', 'type' => 'array'],//spb
+                ],
+            ],
         ],
         4 => [//сниму
             'type_of_property' => 'custom-67902',
@@ -109,6 +119,16 @@ class FilterOrders
                     'from' => 'custom-67908',
                     'to' => 'custom-67909'
                 ],//По бюджету за 1 кв/м в мес
+            ],
+            'city' => [
+                'district' => [
+                    1 => ['custom' => 'custom-67942', 'type' => 'array'],//msk
+                    2 => ['custom' => 'custom-67941', 'type' => 'array'],//spb
+                ],
+                'metro' => [
+                    1 => ['custom' => 'custom-67940', 'type' => 'array'],//msk
+                    2 => ['custom' => 'custom-67939', 'type' => 'array'],//spb
+                ],
             ],
         ],
     ];
@@ -200,6 +220,10 @@ class FilterOrders
 
             $valueArray = array_map('trim', explode(',',trim(mb_strtolower($objData[$key]))));//Значение в фильтре
 
+            if (!isset( $customFields['city'])) {
+                continue;
+            }
+
             if (!isset( $customFields['city'][$key])) {
                 continue;
             }
@@ -247,14 +271,16 @@ class FilterOrders
 
         //Проверяем метро
         if (!empty($objData['metro'])) {
-            $valueArray = $objData['metro'];//Значение в фильтре
-            $objectValue = array_diff($customs[$customFields['city']['metro'][$typeOfObjectAddress]], ['']);//Значение в заявке
+            if (isset($customFields['city'])) {
+                $valueArray = $objData['metro'];//Значение в фильтре
+                $objectValue = array_diff($customs[$customFields['city']['metro'][$typeOfObjectAddress]['custom']], ['']);//Значение в заявке
 
-            if (!empty($objectValue)) {
-                $mainChecker = 1;
+                if (!empty($objectValue)) {
+                    $mainChecker = 1;
 
-                if (empty(array_intersect($objectValue, $valueArray))) {
-                    return false;
+                    if (empty(array_intersect($objectValue, $valueArray))) {
+                        return false;
+                    }
                 }
             }
         }
