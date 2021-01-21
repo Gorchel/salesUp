@@ -130,6 +130,7 @@ class FilterOrders
                     2 => ['custom' => 'custom-67939', 'type' => 'array'],//spb
                 ],
             ],
+            'type_of_activity' => 'custom-69022',
         ],
     ];
 
@@ -179,6 +180,7 @@ class FilterOrders
         foreach (['type_of_property','type_of_activity'] as $key) {
             if (!empty($objData[$key])) {
                 $ordersValues = $this->getValue($key, $customs, $customFields);
+
                 if (is_array($ordersValues)) {
                     $ordersValues = array_diff($this->getValue($key, $customs, $customFields), ['']);
 
@@ -254,11 +256,7 @@ class FilterOrders
 
             foreach ($objectValue as $objVal) {//Поиск по полю в заявке
                 foreach ($valueArray as $value) {//Значение в фильтре
-                    if (empty($keyEl)) {
-                        continue;
-                    }
-
-                    if (strpos($objVal, $value) === false) {
+                    if (strpos($objVal, $value) !== false) {
                         $checker = 1;
                     }
                 }

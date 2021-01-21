@@ -219,7 +219,6 @@ class WebhookObjectsController extends Controller
             $msg = "Заявки не найдены";
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
-        dd($filterOrders);
 
         //прописываем связи
         $companies = [];
@@ -257,13 +256,13 @@ class WebhookObjectsController extends Controller
 
         if (!empty($companies)) {
             foreach ($companies as $companyId) {
-                $company = $methods->getCompany($companyId);
-
-                if (!empty($company['relationships']['contacts']['data'])) {
-                    foreach ($company['relationships']['contacts']['data'] as $contact) {
-                        $contacts[$contact['id']] = $contact['id'];
-                    }
-                }
+//                $company = $methods->getCompany($companyId);
+//
+//                if (!empty($company['relationships']['contacts']['data'])) {
+//                    foreach ($company['relationships']['contacts']['data'] as $contact) {
+//                        $contacts[$contact['id']] = $contact['id'];
+//                    }
+//                }
 
                 $companiesData[] = [
                     'type' => 'companies',
