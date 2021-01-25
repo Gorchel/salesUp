@@ -143,12 +143,9 @@ class WebhookObjectsController extends Controller
         $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];//Вид деятельности
 
         $objectSlider = [];
-
-        foreach ($filterClass->objectFields as $key => $field) {
-            $objectSlider[$key] = $object['attributes']['customs'][$field];
-        }//Слайдеры
-
-        $objectSlider['footage'] = $object['attributes']['total-area'];//Слайдеры
+        $objectSlider['footage'] = !empty($object['attributes']['total-area']) ? $object['attributes']['total-area'] : 1500;//Слайдеры
+        $objectSlider['budget_volume'] = !empty($object['attributes']['customs']['custom-61758']) ? $object['attributes']['customs']['custom-61758'] : 150000;//Слайдеры
+        $objectSlider['budget_footage'] = !empty($object['attributes']['customs']['custom-61759']) ? $object['attributes']['customs']['custom-61759'] : 1000;//Слайдеры
 
         $typeOfPropertyObj = $object['attributes']['customs'][$this->typeOfPropertyField];//Вид деятельности
 

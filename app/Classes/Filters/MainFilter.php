@@ -50,20 +50,36 @@ class MainFilter
 
         $sliderData = $this->getSliderOrderData($object_type, $orderCustoms, $type, $order);
 
+        $totalArea = 1500;
+
         if (isset($data['footage']) && !empty($data['footage'])) {
             if (($type == 'order') && !empty($data['footage'])) {
                 if (isset($sliderData['footage'])) {
-                    $data['footage'] = $this->getArrayByPercent($sliderData['footage'], 'footage', $data);
-                } else {
-                    $data['footage'] = null;
+                    $totalArea = $sliderData['footage'];
                 }
+
+//                if (isset($sliderData['footage'])) {
+                    $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
+//                } else {
+//                    $data['footage'] = null;
+//                }
             } else {
-                $data['footage'] = $this->getArrayByPercent($order['attributes']['total-area'], 'footage', $data);
+                if (!empty($order['attributes']['total-area'])) {
+                    $totalArea = $order['attributes']['total-area'];
+                }
+
+                $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
             }
         }
 
-        if (isset($data['budget_volume']) && !empty($sliderData['budget_volume'])) {
-            $budget_volume = $this->getArrayByPercent($sliderData['budget_volume'], 'budget_volume', $data);
+        $budgetVolume = 150000;
+
+        if (!empty($sliderData['budget_volume'])) {
+            $budgetVolume = $sliderData['budget_volume'];
+        }
+
+        if (isset($data['budget_volume']) && !empty($budgetVolume)) {
+            $budget_volume = $this->getArrayByPercent($budgetVolume, 'budget_volume', $data);
 
             if (!empty($budget_volume)) {
                 $data['budget_volume'] = $budget_volume;
@@ -72,8 +88,14 @@ class MainFilter
             }
         }
 
-        if (isset($data['budget_footage']) && !empty($sliderData['budget_footage'])) {
-            $budget_volume = $this->getArrayByPercent($sliderData['budget_footage'], 'budget_footage', $data);
+        $budgetFootage = 150000;
+
+        if (!empty($sliderData['budget_footage'])) {
+            $budgetFootage = $sliderData['budget_footage'];
+        }
+
+        if (isset($data['budget_footage']) && !empty($budgetFootage)) {
+            $budget_volume = $this->getArrayByPercent($budgetFootage, 'budget_footage', $data);
 
             if (!empty($budget_volume)) {
                 $data['budget_footage'] = $budget_volume;
