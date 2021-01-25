@@ -143,9 +143,9 @@ class WebhookObjectsController extends Controller
         $profileCompanies = $object['attributes']['customs'][$this->objectProfileOfCompany];//Вид деятельности
 
         $objectSlider = [];
-        $objectSlider['footage'] = !empty($object['attributes']['total-area']) ? $object['attributes']['total-area'] : 1500;//Слайдеры
+        $objectSlider['footage'] = !empty($object['attributes']['total-area']) ? $object['attributes']['total-area'] : 100;//Слайдеры
         $objectSlider['budget_volume'] = !empty($object['attributes']['customs']['custom-61758']) ? $object['attributes']['customs']['custom-61758'] : 150000;//Слайдеры
-        $objectSlider['budget_footage'] = !empty($object['attributes']['customs']['custom-61759']) ? $object['attributes']['customs']['custom-61759'] : 1000;//Слайдеры
+        $objectSlider['budget_footage'] = !empty($object['attributes']['customs']['custom-61759']) ? $object['attributes']['customs']['custom-61759'] : 1500;//Слайдеры
 
         $typeOfPropertyObj = $object['attributes']['customs'][$this->typeOfPropertyField];//Вид деятельности
 

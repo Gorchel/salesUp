@@ -50,7 +50,7 @@ class MainFilter
 
         $sliderData = $this->getSliderOrderData($object_type, $orderCustoms, $type, $order);
 
-        $totalArea = 1500;
+        $totalArea = 100;
 
         if (isset($data['footage']) && !empty($data['footage'])) {
             if (($type == 'order') && !empty($data['footage'])) {
@@ -88,7 +88,7 @@ class MainFilter
             }
         }
 
-        $budgetFootage = 150000;
+        $budgetFootage = 1500;
 
         if (!empty($sliderData['budget_footage'])) {
             $budgetFootage = $sliderData['budget_footage'];
