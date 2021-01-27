@@ -120,23 +120,33 @@ class MainFilter
         if ($type == 'order') {
             $ranges = $filterOrdersClass->getCustomArray($objectTypeId, 'ranges');
 
+            $defaultData = [
+                'footage' => 100,
+                'budget_volume' => 150000,
+                'budget_footage' => 1500,
+            ];
+
             foreach (['footage', 'budget_volume', 'budget_footage'] as $key) {
                 if (isset($ranges[$key])) {
                     if (isset($ranges[$key]['value']) && !empty($ranges[$key]['value'])) {
                         $keyValue = $orderCustoms[$ranges[$key]['value']];
 
-                        if (!empty($keyValue)) {
-                            $objectSlider[$key] = $keyValue;
+                        if (empty($keyValue)) {
+                            $keyValue = $defaultData[$key];
                         }
+
+                        $objectSlider[$key] = $keyValue;
                     } else {
                         $from = (int) $orderCustoms[$ranges[$key]['from']];
                         $to = (int) $orderCustoms[$ranges[$key]['to']];
 
                         $value = ($from + $to) / 2;
 
-                        if (!empty($value)) {
-                            $objectSlider[$key] = $value;
+                        if (empty($keyValue)) {
+                            $value = $defaultData[$key];
                         }
+
+                        $objectSlider[$key] = $value;
                     }
                 }
             }//Слайдеры
