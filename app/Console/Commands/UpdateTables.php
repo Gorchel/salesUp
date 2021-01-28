@@ -135,7 +135,7 @@ class UpdateTables extends Command
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
 
         if (!empty($attributes['discarded-at'])) {
-            if (!empty($propertyModel)) {
+            if (!empty($orderModel)) {
                 $orderModel->delete();
             }
 

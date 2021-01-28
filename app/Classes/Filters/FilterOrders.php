@@ -283,7 +283,7 @@ class FilterOrders
             }
         }
 
-        //проверяем по площади
+//        проверяем по площади
         foreach (['footage','budget_volume','budget_footage'] as $key) {
             if (empty($objData[$key])) {//Если пустое значение поля
                 continue;
@@ -293,9 +293,8 @@ class FilterOrders
                 continue;
             }
 
-            $mainChecker = 1;
-
             $ranges = $customFields['ranges'][$key];//from/to
+            $crossInterval = 0;
 
             if (isset($ranges['value'])) {
                 $value = intval($customs[$ranges['value']]);
@@ -305,7 +304,11 @@ class FilterOrders
                     $value = $value * 1000;
                 }
 
-                $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
+                if (!empty($value)) {
+                    $mainChecker = 1;
+
+                    $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
+                }
             } else {
                 $from = intval($customs[$ranges['from']]);
                 $to = intval($customs[$ranges['to']]);
@@ -316,7 +319,19 @@ class FilterOrders
                     $to = $to * 1000;
                 }
 
-                $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
+                if (!empty($from) || !empty($to)) {
+                    if (empty($from)) {
+                        $from = 0;
+                    }
+
+                    if (empty($to)) {
+                        $to = 999999;
+                    }
+
+                    $mainChecker = 1;
+
+                    $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
+                }
             }
 
             if (empty($crossInterval)) {
@@ -324,17 +339,22 @@ class FilterOrders
             }
         }
 
+//        dd($mainChecker);
+
         //Предполагаемый срок окупаемости в мес
         if (!empty($objData['payback_period'])) {
             if (isset($customFields['ranges']['payback_period'])) {
-                $mainChecker = 1;
                 $paybackValue = intval($customs[$customFields['ranges']['payback_period']]);//payback_period
 
-                $from = intval($objData['payback_period'][0]);
-                $to = intval($objData['payback_period'][1]);
+                if (!empty($paybackValue)) {
+                    $mainChecker = 1;
 
-                if ($paybackValue < $from || $to < $paybackValue) {
-                    return false;
+                    $from = intval($objData['payback_period'][0]);
+                    $to = intval($objData['payback_period'][1]);
+
+                    if ($paybackValue < $from || $to < $paybackValue) {
+                        return false;
+                    }
                 }
             }
         }
@@ -410,13 +430,13 @@ class FilterOrders
                 continue;
             }
 
-            $mainChecker = 1;
-
             $value = intval($customs[$customFields[$key]]);
 
             if (empty($value)) {
                 continue;
             }
+
+            $mainChecker = 1;
 
             //Корректировка тысяч
             if ($key == 'budget_volume') {

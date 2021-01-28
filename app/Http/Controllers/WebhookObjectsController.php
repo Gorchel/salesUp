@@ -217,7 +217,20 @@ class WebhookObjectsController extends Controller
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
-//        dd($filterOrders);
+//        $footage = [];
+//
+//        foreach ($filterOrders as $order) {
+//            $customs = json_decode($order->customs, true);
+//
+//            $footage[] = $customs['custom-67908'].'-'.$customs['custom-67909'];
+//        }
+//
+//        dd($footage);
+
+        if (count($filterOrders) > 50) {
+            return view('count', ['count' => count($filterOrders)]);
+        }
+
         //прописываем связи
         $companies = [];
         $contacts = [];
