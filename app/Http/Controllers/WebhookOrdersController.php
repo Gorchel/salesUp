@@ -90,8 +90,8 @@ class WebhookOrdersController extends Controller
         $id = $request->get('ids')[0];
         $token = env('API_TOKEN');
         $type = $request->get('type');
-        $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 1;
-        $cityTypeId = $request->has('city_type') ? $request->get('city_type') : 1;
+        $objectTypeId = $request->has('object_type') ? $request->get('object_type') : 4;
+        $cityTypeId = $request->has('city_type') ? $request->get('city_type') : 2;
 
         $filterOrdersClass = new FilterOrders;
 

@@ -113,7 +113,7 @@ class WebhookObjectsController extends Controller
 
         $address = $object['attributes']['address'];
 
-        $objectType = $request->has('object_type') ? $request->get('object_type') : 1;
+        $objectType = $request->has('object_type') ? $request->get('object_type') : 4;
 
         $filterClass = new MainFilter();
 
