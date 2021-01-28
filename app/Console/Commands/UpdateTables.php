@@ -193,12 +193,24 @@ class UpdateTables extends Command
      */
     public function storeProperty($property)
     {
-        $propertyModel = Properties::where('id', $property['id'])
-            ->first();
 
         $attributes = $property['attributes'];
 
+        $propertyModel = Properties::where('id', $property['id'])
+            ->first();
+
+
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
+
+        if (!isset($attributes['customs']['custom-71235'][0]) || !in_array($attributes['customs']['custom-71235'][0], ['Горящий', 'Активный'])) {
+            if (!empty($propertyModel)) {
+                $propertyModel->delete();
+            }
+
+            return;
+        }
+
+
 
         if (!empty($attributes['discarded-at'])) {
             if (!empty($propertyModel)) {

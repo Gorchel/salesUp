@@ -217,6 +217,7 @@ class WebhookObjectsController extends Controller
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
+//        dd($filterOrders);
         //прописываем связи
         $companies = [];
         $contacts = [];
@@ -293,7 +294,7 @@ class WebhookObjectsController extends Controller
 
         $data = [
             'attributes' => [
-                'name' => 'Сделка по объекту',
+                'name' => $address,
                 'description' => $object['id'],
             ],
             'relationships' => [

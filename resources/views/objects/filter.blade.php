@@ -7,19 +7,22 @@
             <input type="hidden" name="id" value="{{$id}}">
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input"  id="select-all-checkboxes" value="1">
+                        <label class="custom-control-label" for="select-all-checkboxes">Все</label>
+                    </div>
                     <select name="object_type" id="object_type" class="form-control">
-                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>
-                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>
-                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
                         <option value="4" {{$objectType == 4 ? 'selected="selected"' : ''}}>Сниму</option>
-
+{{--                        <option value="1" {{$objectType == 1 ? 'selected="selected"' : ''}}>Сдам</option>--}}
+{{--                        <option value="2" {{$objectType == 2 ? 'selected="selected"' : ''}}>Продам</option>--}}
+                        <option value="3" {{$objectType == 3 ? 'selected="selected"' : ''}}>Куплю</option>
                     </select>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1" checked="checked">
+                        <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1">
                         <label class="custom-control-label" for="type_of_property_check">По типу недвижимости</label>
                     </div>
                     <select name="type_of_property[]" id="type_of_property" class="form-control" multiple="multiple">
@@ -33,7 +36,7 @@
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1" checked="checked">
+                            <input type="checkbox" class="custom-control-input" id="streetCheck" name="street_check" value="1">
                             <label class="custom-control-label" for="streetCheck">Улица, Дом</label>
                         </div>
                         <input type="text" class="form-control input-sm" name="street" value="{{$address}}">
@@ -42,7 +45,7 @@
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="type_of_activity_check" name="type_of_activity_check" value="1" checked="checked">
+                            <input type="checkbox" class="custom-control-input" id="type_of_activity_check" name="type_of_activity_check" value="1">
                             <label class="custom-control-label" for="type_of_activity_check">По Виду деятельности</label>
                         </div>
                         <select name="type_of_activity[]" id="type_of_activity" class="form-control" multiple="multiple">
@@ -57,7 +60,7 @@
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="address_program_check" name="address_program_check" value="1" checked="checked">
+                            <input type="checkbox" class="custom-control-input" id="address_program_check" name="address_program_check" value="1">
                             <label class="custom-control-label" for="address_program_check">Есть ли адрессная программа?</label>
                         </div>
                         <select name="address_program" id="address_program" class="form-control">
@@ -71,7 +74,7 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="districtCheck" name="district_check" value="1" checked="checked">
+                        <input type="checkbox" class="custom-control-input" id="districtCheck" name="district_check" value="1">
                         <label class="custom-control-label" for="districtCheck">Район</label>
                     </div>
                     <input type="text" class="form-control input-sm" name="district" value="{{isset($districtArray[0]) ? $districtArray[0] : ''}}">
@@ -80,7 +83,7 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="metroCheck" name="metro_check" value="1" checked="checked">
+                        <input type="checkbox" class="custom-control-input" id="metroCheck" name="metro_check" value="1">
                         <label class="custom-control-label" for="metroCheck">Метро</label>
                     </div>
                     <select name="metro[]" id="metro" class="form-control" multiple="multiple">
@@ -96,7 +99,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1" checked="checked">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1">
                                     <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
                                 </div>
                                 <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -128,7 +131,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1" checked="checked">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1">
                                     <label class="custom-control-label" for="customCheckTwo">По бюджету, руб.мес</label>
                                 </div>
                                 <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -160,7 +163,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1" checked="checked">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1">
                                     <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
                                 </div>
                                 <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -192,7 +195,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1" checked="checked">
+                                    <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1">
                                     <label class="custom-control-label" for="payback_period_check">Предполагаемый срок окупаемости в мес</label>
                                 </div>
                                 <input id="payback_period" name="payback_period" type="text" class="btm-color" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[12,24]" style="width: 80%;"/>&nbsp;<b>&nbsp;мес.</b>
@@ -223,7 +226,7 @@
                 <div class="row">
                     <div class="col-lg-10 offset-lg-1 form-group">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1" checked="checked">
+                            <input type="checkbox" class="custom-control-input" id="client_type_check" name="client_type_check" value="1">
                             <label class="custom-control-label" for="client_type_check">Клиент</label>
                         </div>
                         <select name="client_type" id="client_type" class="form-control">
@@ -239,6 +242,11 @@
                 </div>
             </div>
         </form>
+        <div class="row hidden" id="loader">
+            <div class="col-lg-10 offset-lg-1 form-group text-center">
+                <h1 сlass="text-center">Загрузка</h1>
+            </div>
+        </div>
     @parent
 @overwrite
 
@@ -312,6 +320,23 @@
                 // changeObjType()
                 location.href = location.href + '&object_type=' + $("select#object_type option:selected").val();
             });
+
+            $('body').on('change', '#select-all-checkboxes', function() {
+                var value = $(this).prop('checked');
+
+                $.each($('.custom-control-input'), function() {
+                    $(this).prop('checked', value);
+                });
+            })
+
+            $('#submitForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $(this).hide();
+                $('#loader').show();
+
+                location.href = location.origin + '/weebhook_estate_get?' + $(this).serialize();
+            })
         });
 
         function updateSlider(realVal, value)

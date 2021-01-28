@@ -170,7 +170,7 @@ class WebhookOrdersController extends Controller
         $order = $methods->getOrder($request->get('id'));
 
         //Данные по фильтрам
-        $objData = $filterClass->prepareData($request,$order, 'order', $object_type);
+        $objData = $filterClass->prepareData($request, $order, 'order', $object_type);
 
         if (empty($objData)) {
             $msg = "Выберите фильтры";
@@ -215,7 +215,7 @@ class WebhookOrdersController extends Controller
                 return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
             }
         }
-
+//        dd($filterOrders);
         //прописываем связи
         $companies = [];
         $contacts = [];
