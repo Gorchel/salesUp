@@ -304,11 +304,13 @@ class FilterOrders
                     $value = $value * 1000;
                 }
 
-                if (!empty($value)) {
-                    $mainChecker = 1;
-
-                    $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
+                if (empty($value)) {
+                    continue;
                 }
+
+                $mainChecker = 1;
+
+                $crossInterval = $this->crossingIntervalByValue($value, $objData[$key][0], $objData[$key][1]);
             } else {
                 $from = intval($customs[$ranges['from']]);
                 $to = intval($customs[$ranges['to']]);
@@ -319,19 +321,21 @@ class FilterOrders
                     $to = $to * 1000;
                 }
 
-                if (!empty($from) || !empty($to)) {
-                    if (empty($from)) {
-                        $from = 0;
-                    }
-
-                    if (empty($to)) {
-                        $to = 999999;
-                    }
-
-                    $mainChecker = 1;
-
-                    $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
+                if (empty($from) && empty($to)) {
+                    continue;
                 }
+
+                if (empty($from)) {
+                    $from = 0;
+                }
+
+                if (empty($to)) {
+                    $to = 999999;
+                }
+
+                $mainChecker = 1;
+
+                $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
             }
 
             if (empty($crossInterval)) {
