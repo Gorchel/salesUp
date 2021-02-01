@@ -190,6 +190,8 @@ class FilterOrders
                         if (is_array($objData[$key]) && empty(array_intersect($ordersValues, $objData[$key]))) {
                             return false;
                         }
+                    } else {//test
+                        return false;
                     }
                 }
             }
@@ -209,6 +211,8 @@ class FilterOrders
                         if (!in_array($objData[$key], $ordersValues)) {
                             return false;
                         }
+                    } else {//test
+                        return false;
                     }
                 }
             }
@@ -232,13 +236,13 @@ class FilterOrders
 
             $customArray = $customFields['city'][$key][$typeOfObjectAddress];//Значения в поле
 
-            //проверяем по городам
-            $checker = 0;
-
             //Проверяем наличие
             if (!isset($customs[$customArray['custom']])) {
                 continue;
             }
+
+            //проверяем по городам
+            $checker = 0;
 
             $objectValue = $customs[$customArray['custom']];//Значение в заявке
 
@@ -279,6 +283,8 @@ class FilterOrders
                     if (empty(array_intersect($objectValue, $valueArray))) {
                         return false;
                     }
+                } {//test
+                    return false;
                 }
             }
         }
@@ -305,7 +311,8 @@ class FilterOrders
                 }
 
                 if (empty($value)) {
-                    continue;
+                    return false;//test
+//                    continue;
                 }
 
                 $mainChecker = 1;
@@ -322,7 +329,8 @@ class FilterOrders
                 }
 
                 if (empty($from) && empty($to)) {
-                    continue;
+//                    continue;
+                    return false;//test
                 }
 
                 if (empty($from)) {
@@ -359,6 +367,8 @@ class FilterOrders
                     if ($paybackValue < $from || $to < $paybackValue) {
                         return false;
                     }
+                } else {
+                    return false;//test
                 }
             }
         }
@@ -395,6 +405,8 @@ class FilterOrders
                     if (empty(array_intersect($ordersValues, $objData[$key]))) {
                         return false;
                     }
+                } else {//test
+                    return false;
                 }
             }
         }
@@ -412,6 +424,8 @@ class FilterOrders
                     return false;
                 }
 //                dd($ordersValues);
+            } else {//test
+                return false;
             }
         }
 
@@ -426,6 +440,8 @@ class FilterOrders
                 if (empty($crossInterval)) {
                     return false;
                 }
+            } else {//test
+                return false;
             }
         }
 
@@ -437,7 +453,8 @@ class FilterOrders
             $value = intval($customs[$customFields[$key]]);
 
             if (empty($value)) {
-                continue;
+//                continue;
+                return false;
             }
 
             $mainChecker = 1;
@@ -480,7 +497,8 @@ class FilterOrders
             $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
 
             if (empty($objectValue)) {
-                continue;
+//                continue;
+                return false;
             }
 
             $mainChecker = 1;
@@ -521,7 +539,8 @@ class FilterOrders
             $objectValue = array_diff(array_map('mb_strtolower', $objectValue),['']);
 
             if (empty($objectValue)) {
-                continue;
+//                continue;
+                return false;
             }
 
             foreach ($objectValue as $objVal) {//Поиск по полю в заявке
@@ -553,6 +572,8 @@ class FilterOrders
                     if (empty($crossInterval)) {
                         return false;
                     }
+                } else {//test
+                    return false;
                 }
             }
         }

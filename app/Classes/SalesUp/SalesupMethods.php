@@ -165,6 +165,33 @@ class SalesupMethods
 
     /**
      * @param int $dealId
+     * @param array $relationships
+     * @return
+     * @throws \Exception
+     */
+    public function dealDataUpdate(int $dealId, array $relationships)
+    {
+        $path = 'deals/'.$dealId;
+
+        $body = [
+            'data' => [
+                'type' => 'deals',
+                'id' => $dealId,
+                'relationships' => $relationships,
+            ],
+        ];
+
+        $jsonResponse = $this->patchRequest($path, json_encode($body));
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response);
+
+        return $response['data'];
+    }
+
+    /**
+     * @param int $dealId
      */
     public function dealCreate(array $data)
     {

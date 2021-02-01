@@ -2,9 +2,11 @@
 
 @section("content")
     <div class="row text-center">
-        <div class="col-lg-12">
-            <b>Сделка: </b><span>№{{$deal['attributes']['number']}} создана.</span>
-        </div>
+        @foreach ($deals as $deal)
+            <div class="col-lg-12">
+                <b>Сделка: </b><span>№{{$deal['attributes']['number']}} создана.</span>
+            </div>
+        @endforeach
         <div class="col-lg-12">
             <b>Объект недвижимости: </b><span>{{$object['attributes']['name']}}</span>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\SalesUp\SalesupMethods;
+use App\Jobs\OrderJobs;
 use App\Properties;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -176,7 +177,7 @@ class WebhookObjectsController extends Controller
      */
     public function webhookEstateGet(Request $request)
     {
-        $handler = new SalesupHandler($request->get('token'));
+        $handler = new SalesupHandler(env('API_TOKEN'));
         $methods = $handler->methods;
 
         $filterClass = new MainFilter;
@@ -217,56 +218,58 @@ class WebhookObjectsController extends Controller
             return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
         }
 
+//        dd(count($filterOrders));
+//
 //        $footage = [];
 //
 //        foreach ($filterOrders as $order) {
 //            $customs = json_decode($order->customs, true);
 //
-//            $footage[] = $customs['custom-67908'].'-'.$customs['custom-67909'];
+//            $footage[] = $customs['custom-67904'].' '.$customs['custom-67905'];
 //        }
 //
 //        dd($footage);
 
-        if (count($filterOrders) > 50) {
-            return view('count', ['count' => count($filterOrders)]);
-        }
+//        foreach (array_chunk($filterOrders, 50) as $filterChunkOrders) {
+//            dispatch(new OrderJobs($dealResponse['id'], json_encode($filterChunkOrders)));
+//        }
 
-        //прописываем связи
-        $companies = [];
-        $contacts = [];
+        $dealResponses = [];
 
-        foreach ($filterOrders as $filterOrder) {
-            $relationships = json_decode($filterOrder['relationships'], true);
+        foreach (array_chunk($filterOrders, 100) as $filterChunkOrders) {
+            //прописываем связи
+            $companies = [];
+            $contacts = [];
+            $orderData = [];
 
-            //Компании
-            if (!empty($relationships['companies']['data'])) {
-                foreach ($relationships['companies']['data'] as $company) {
-                    $companies[$company['id']] = $company['id'];
+            foreach ($filterChunkOrders as $filterOrder) {
+                $relationships = json_decode($filterOrder['relationships'], true);
+
+                //Компании
+                if (!empty($relationships['companies']['data'])) {
+                    foreach ($relationships['companies']['data'] as $company) {
+                        $companies[$company['id']] = $company['id'];
+                    }
                 }
+
+                //Контакты
+                if (!empty($relationships['contacts']['data'])) {
+                    foreach ($relationships['contacts']['data'] as $contact) {
+                        $contacts[$contact['id']] = $contact['id'];
+                    }
+                }
+
+                $orderData[] = [
+                    'type' => 'orders',
+                    'id' => $filterOrder['id'],
+                ];
             }
 
-            //Контакты
-            if (!empty($relationships['contacts']['data'])) {
-                foreach ($relationships['contacts']['data'] as $contact) {
-                    $contacts[$contact['id']] = $contact['id'];
-                }
-            }
-        }
+            //Проверяем компании
+            $companiesData = [];
 
-        $orderData = [];
-
-        foreach ($filterOrders as $order) {
-            $orderData[] = [
-                'type' => 'orders',
-                'id' => $order['id'],
-            ];
-        }
-
-        //Проверяем компании
-        $companiesData = [];
-
-        if (!empty($companies)) {
-            foreach ($companies as $companyId) {
+            if (!empty($companies)) {
+                foreach ($companies as $companyId) {
 //                $company = $methods->getCompany($companyId);
 //
 //                if (!empty($company['relationships']['contacts']['data'])) {
@@ -275,72 +278,191 @@ class WebhookObjectsController extends Controller
 //                    }
 //                }
 
-                $companiesData[] = [
-                    'type' => 'companies',
-                    'id' => $companyId,
-                ];
+                    $companiesData[] = [
+                        'type' => 'companies',
+                        'id' => $companyId,
+                    ];
+                }
             }
-        }
 
-        $contactsData = [];
+            $contactsData = [];
 
-        if (!empty($companies)) {
-            foreach ($contacts as $contactsId) {
-                $contactsData[] = [
-                    'type' => 'contacts',
-                    'id' => $contactsId,
-                ];
+            if (!empty($contacts)) {
+                foreach ($contacts as $contactsId) {
+                    $contactsData[] = [
+                        'type' => 'contacts',
+                        'id' => $contactsId,
+                    ];
+                }
             }
-        }
 
-        switch ($object_type) {
-            case 1:
-            case 2:
-                $stage = 32745;
-                break;
-            case 3:
-                $stage = 32747;
-                break;
-            default:
-                $stage = 32746;
-        }
+            switch ($object_type) {
+                case 1:
+                case 2:
+                    $stage = 32745;
+                    break;
+                case 3:
+                    $stage = 32747;
+                    break;
+                default:
+                    $stage = 32746;
+            }
 
-        $data = [
-            'attributes' => [
-                'name' => $address,
-                'description' => $object['id'],
-            ],
-            'relationships' => [
-                'contacts' => [
-                    'data' => $contactsData,
+            $data = [
+                'attributes' => [
+                    'name' => $address,
+                    'description' => $object['id'],
                 ],
-                'companies' => [
-                    'data' => $companiesData,
+                'relationships' => [
+                    'contacts' => [
+                        'data' => $contactsData,
+                    ],
+                    'companies' => [
+                        'data' => $companiesData,
+                    ],
+                    'orders' => [
+                        'data' => $orderData,
+                    ],
+                    'stage-category' => [
+                        'type' => 'stage-category',
+                        'id' => $stage,//Воронка Аренда/Продажа
+                    ],
                 ],
-                'orders' => [
-                    'data' => $orderData,
-                ],
-                'stage-category' => [
-                    'type' => 'stage-category',
-                    'id' => $stage,//Воронка Аренда/Продажа
-                ],
-            ],
-        ];
+            ];
 
-        $dealResponse = $methods->dealCreate($data);
+            $dealResponse = $methods->dealCreate($data);
 
-        foreach ($filterOrders as $order) {
             $methods->attachDealToObject($dealResponse['id'], $object['id']);
+
+            $dealResponses[] = $dealResponse;
         }
 
         $viewData = [
-            'deal' => $dealResponse,
+            'deals' => $dealResponses,
             'object' => $object,
             'ordersCount' => count($filterOrders),
         ];
 
         return view('objects.success', $viewData);
+
+
+//        if (count($filterOrders) > 50) {
+//            return view('count', ['count' => count($filterOrders)]);
+//        }
+
+
+
+//        //прописываем связи
+//        $companies = [];
+//        $contacts = [];
+//
+//        foreach ($filterOrders as $filterOrder) {
+//            $relationships = json_decode($filterOrder['relationships'], true);
+//
+//            //Компании
+//            if (!empty($relationships['companies']['data'])) {
+//                foreach ($relationships['companies']['data'] as $company) {
+//                    $companies[$company['id']] = $company['id'];
+//                }
+//            }
+//
+//            //Контакты
+//            if (!empty($relationships['contacts']['data'])) {
+//                foreach ($relationships['contacts']['data'] as $contact) {
+//                    $contacts[$contact['id']] = $contact['id'];
+//                }
+//            }
+//        }
+//
+//        $orderData = [];
+//
+//        foreach ($filterOrders as $order) {
+//            $orderData[] = [
+//                'type' => 'orders',
+//                'id' => $order['id'],
+//            ];
+//        }
+//
+//        //Проверяем компании
+//        $companiesData = [];
+//
+//        if (!empty($companies)) {
+//            foreach ($companies as $companyId) {
+////                $company = $methods->getCompany($companyId);
+////
+////                if (!empty($company['relationships']['contacts']['data'])) {
+////                    foreach ($company['relationships']['contacts']['data'] as $contact) {
+////                        $contacts[$contact['id']] = $contact['id'];
+////                    }
+////                }
+//
+//                $companiesData[] = [
+//                    'type' => 'companies',
+//                    'id' => $companyId,
+//                ];
+//            }
+//        }
+//
+//        $contactsData = [];
+//
+//        if (!empty($companies)) {
+//            foreach ($contacts as $contactsId) {
+//                $contactsData[] = [
+//                    'type' => 'contacts',
+//                    'id' => $contactsId,
+//                ];
+//            }
+//        }
+//
+//        switch ($object_type) {
+//            case 1:
+//            case 2:
+//                $stage = 32745;
+//                break;
+//            case 3:
+//                $stage = 32747;
+//                break;
+//            default:
+//                $stage = 32746;
+//        }
+//
+//        $data = [
+//            'attributes' => [
+//                'name' => $address,
+//                'description' => $object['id'],
+//            ],
+//            'relationships' => [
+//                'contacts' => [
+//                    'data' => $contactsData,
+//                ],
+//                'companies' => [
+//                    'data' => $companiesData,
+//                ],
+//                'orders' => [
+//                    'data' => $orderData,
+//                ],
+//                'stage-category' => [
+//                    'type' => 'stage-category',
+//                    'id' => $stage,//Воронка Аренда/Продажа
+//                ],
+//            ],
+//        ];
+//
+//        $dealResponse = $methods->dealCreate($data);
+//
+//        foreach ($filterOrders as $order) {
+//            $methods->attachDealToObject($dealResponse['id'], $object['id']);
+//        }
+//
+//        $viewData = [
+//            'deal' => $dealResponse,
+//            'object' => $object,
+//            'ordersCount' => count($filterOrders),
+//        ];
+//
+//        return view('objects.success', $viewData);
     }
+
 
     /**
      * @param $request

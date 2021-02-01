@@ -202,7 +202,9 @@ class UpdateTables extends Command
 
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
 
-        if (!isset($attributes['customs']['custom-71235'][0]) || !in_array($attributes['customs']['custom-71235'][0], ['Горящий', 'Активный'])) {
+        if (!isset($attributes['customs']['custom-71235'][0]) || !in_array(
+            $attributes['customs']['custom-71235'][0], ['Горящий', 'Активный']
+            )) {
             if (!empty($propertyModel)) {
                 $propertyModel->delete();
             }
