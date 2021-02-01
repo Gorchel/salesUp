@@ -103,7 +103,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckOne" name="footage_check" value="1"  checked="checked">
                                     <label class="custom-control-label" for="customCheckOne">По площади (кв/м)</label>
                                 </div>
                                 <input id="footage" type="text" name="footage" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -135,7 +135,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckTwo" name="budget_volume_check" value="1"  checked="checked">
                                     <label class="custom-control-label" for="customCheckTwo">По бюджету, руб.мес</label>
                                 </div>
                                 <input id="budget_volume" name="budget_volume" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -167,7 +167,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1"  checked="checked">
                                     <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
                                 </div>
                                 <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>
@@ -200,7 +200,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1">
+                                    <input type="checkbox" class="custom-control-input" id="payback_period_check" name="payback_period_check" value="1" >
                                     <label class="custom-control-label" for="payback_period_check">Предполагаемый срок окупаемости в мес</label>
                                 </div>
                                 <input id="payback_period" name="payback_period" type="text" class="btm-color" value="" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="[12,24]" style="width: 80%;"/>&nbsp;<b>&nbsp;мес.</b>
