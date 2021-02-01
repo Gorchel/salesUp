@@ -253,7 +253,8 @@ class FilterOrders
             }
 
             if (empty($objectValue)) {
-                continue;
+//                continue;
+                return false;
             }
 
             $mainChecker = 1;
