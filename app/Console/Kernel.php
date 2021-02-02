@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->call("update_tables:init orders 2")->everyFiveMinutes();
+        $schedule->call("update_tables:init property 2")->everyFiveMinutes();
     }
 }
