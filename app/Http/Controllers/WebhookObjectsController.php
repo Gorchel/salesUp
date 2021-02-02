@@ -236,13 +236,13 @@ class WebhookObjectsController extends Controller
 
         $dealResponses = [];
 
-        foreach (array_chunk($filterOrders, 100) as $filterChunkOrders) {
+//        foreach (array_chunk($filterOrders, 100) as $filterChunkOrders) {
             //прописываем связи
             $companies = [];
             $contacts = [];
             $orderData = [];
 
-            foreach ($filterChunkOrders as $filterOrder) {
+            foreach ($filterOrders as $filterOrder) {
                 $relationships = json_decode($filterOrder['relationships'], true);
 
                 //Компании
@@ -335,7 +335,7 @@ class WebhookObjectsController extends Controller
             $methods->attachDealToObject($dealResponse['id'], $object['id']);
 
             $dealResponses[] = $dealResponse;
-        }
+//        }
 
         $viewData = [
             'deals' => $dealResponses,
