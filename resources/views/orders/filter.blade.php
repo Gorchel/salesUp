@@ -357,7 +357,7 @@
                 $(this).hide();
                 $('#loader').show();
 
-                location.href = location.origin + '/weebhook_estate_get?' + $(this).serialize();
+                location.href = location.origin + '/weebhook_orders_get?' + $(this).serialize();
             })
         });
 
