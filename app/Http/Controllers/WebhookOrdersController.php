@@ -323,7 +323,17 @@ class WebhookOrdersController extends Controller
 
         if (in_array($object_type, [3,4])) {
             foreach ($filterOrders as $order) {
-                $methods->attachDealToObject($dealResponse['id'], $order['id']);
+                $objDeals = [];
+
+                if (isset($order['relationships']['deals']['data'])) {
+                    foreach ($order['relationships']['deals']['data'] as $objDeal) {
+                        $objDeals[$objDeal['id']] = $objDeal['id'];
+                    }
+                }
+
+                $objDeals[$dealResponse['id']] = $dealResponse['id'];
+
+                $methods->attachDealsToObject($objDeals, $order['id']);
             }
         }
 

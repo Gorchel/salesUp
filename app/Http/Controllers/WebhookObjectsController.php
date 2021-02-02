@@ -183,6 +183,7 @@ class WebhookObjectsController extends Controller
         $filterClass = new MainFilter;
 
         $object = $methods->getObject($request->get('id'));
+
         $address = $object['attributes']['address'];
         $object_type = $request->get('object_type');
         $typeOfObject = $filterClass->checkCity($address);
@@ -332,7 +333,17 @@ class WebhookObjectsController extends Controller
 
             $dealResponse = $methods->dealCreate($data);
 
-            $methods->attachDealToObject($dealResponse['id'], $object['id']);
+            $objDeals = [];
+
+            if (isset($object['relationships']['deals']['data'])) {
+                foreach ($object['relationships']['deals']['data'] as $objDeal) {
+                    $objDeals[$objDeal['id']] = $objDeal['id'];
+                }
+            }
+
+            $objDeals[$dealResponse['id']] = $dealResponse['id'];
+
+            $methods->attachDealsToObject($objDeals, $object['id']);
 
             $dealResponses[] = $dealResponse;
 //        }

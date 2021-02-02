@@ -306,7 +306,7 @@ class SalesupMethods
         $path = 'estate-properties/'.$objectId;
 
         $data = [
-//            'include' => 'deals',
+            'include' => 'deals',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
@@ -401,6 +401,46 @@ class SalesupMethods
                                 'type' => 'deals',
                             ],
                         ],
+                    ],
+                ],
+            ],
+        ];
+
+        $jsonResponse = $this->patchRequest($path, json_encode($body));
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response);
+
+        return $response['data'];
+    }
+
+    /**
+     * @param array $deals
+     * @param int $objectId
+     * @return mixed
+     * @throws \Exception
+     */
+    public function attachDealsToObject(array $deals, int $objectId)
+    {
+        $path = 'estate-properties/'.$objectId;
+
+        $data = [];
+
+        foreach ($deals as $deal) {
+            $data[] = [
+                'id' => $deal,
+                'type' => 'deals',
+            ];
+        }
+
+        $body = [
+            'data' => [
+                'type' => 'estate-properties',
+                'id' => $objectId,
+                'relationships' => [
+                    'deals' => [
+                        'data' => $data,
                     ],
                 ],
             ],
