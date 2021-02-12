@@ -205,6 +205,8 @@ class SalesupMethods
 
         $body = ['data' => $data];
 
+        Log::info(json_encode($body));
+
         $jsonResponse = $this->postRequest($path, json_encode($body));
 
         $response = json_decode($jsonResponse, true);
