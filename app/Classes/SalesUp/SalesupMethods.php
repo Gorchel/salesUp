@@ -2,6 +2,8 @@
 
 namespace App\Classes\SalesUp;
 
+use Illuminate\Support\Facades\Log;
+
 /**
  * Class SalesupMethods
  * @package App\Classes\SalesUp;
@@ -180,6 +182,8 @@ class SalesupMethods
                 'relationships' => $relationships,
             ],
         ];
+
+        Log::info(json_encode($body));
 
         $jsonResponse = $this->patchRequest($path, json_encode($body));
 
