@@ -30,7 +30,7 @@ class MainFilter
      */
     public $objectFields = [
 //        'footage' => 'custom-64803',
-        'budget_volume' => 'custom-61758', 'budget_footage' => 'custom-61759'
+        'budget_volume' => 'custom-61759', 'budget_footage' => 'custom-61758'
     ];
 
     /**

@@ -150,8 +150,8 @@ class FilterOrders
             'is_landlord' => 'custom-61757',
         ],
         4 => [//сниму
-            'budget_volume' => 'custom-61758',
-            'budget_footage' => 'custom-61759',
+            'budget_volume' => 'custom-61759',
+            'budget_footage' => 'custom-61758',
             'payback_period' => 'custom-61718',
             'type_of_property' => 'custom-61755',
             'type_of_activity' => 'custom-61774',
@@ -301,7 +301,6 @@ class FilterOrders
             }
 
             $ranges = $customFields['ranges'][$key];//from/to
-            $crossInterval = 0;
 
             if (isset($ranges['value'])) {
                 $value = intval($customs[$ranges['value']]);
@@ -339,7 +338,7 @@ class FilterOrders
                 }
 
                 if (empty($to)) {
-                    $to = 999999;
+                    $to = 99999999999;
                 }
 
                 $mainChecker = 1;
