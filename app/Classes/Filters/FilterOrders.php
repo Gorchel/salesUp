@@ -322,16 +322,17 @@ class FilterOrders
                 $from = intval($customs[$ranges['from']]);
                 $to = intval($customs[$ranges['to']]);
 
-                //Корректировка тысяч
-                if ($key == 'budget_volume') {
-                    $from = $from * 1000;
-                    $to = $to * 1000;
-                }
+//                //Корректировка тысяч
+//                if ($key == 'budget_volume') {
+//                    $from = $from * 1000;
+//                    $to = $to * 1000;
+//                }
 
                 if (empty($from) && empty($to)) {
 //                    continue;
                     return false;//test
                 }
+
 
                 if (empty($from)) {
                     $from = 0;
