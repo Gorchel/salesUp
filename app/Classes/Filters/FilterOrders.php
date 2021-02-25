@@ -344,7 +344,12 @@ class FilterOrders
 
                 $mainChecker = 1;
 
+//                if ($order['id'] == 714395 && $key == 'budget_volume') {
+//                    dd($from.' '.$to);
+//                }
+
                 $crossInterval = $this->crossingInterval($objData[$key][0], $objData[$key][1], $from, $to);
+
             }
 
             if (empty($crossInterval)) {

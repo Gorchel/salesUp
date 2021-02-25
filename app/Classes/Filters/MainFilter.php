@@ -53,23 +53,28 @@ class MainFilter
         $totalArea = 100;
 
         if (isset($data['footage']) && !empty($data['footage'])) {
-            if (($type == 'order') && !empty($data['footage'])) {
-                if (isset($sliderData['footage'])) {
-                    $totalArea = $sliderData['footage'];
-                }
-
+//            if (($type == 'order') && !empty($data['footage'])) {
 //                if (isset($sliderData['footage'])) {
-                    $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
-//                } else {
-//                    $data['footage'] = null;
+//                    $totalArea = $sliderData['footage'];
 //                }
-            } else {
-                if (!empty($order['attributes']['total-area'])) {
-                    $totalArea = $order['attributes']['total-area'];
-                }
+//
+////                if (isset($sliderData['footage'])) {
+//                    $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
+////                } else {
+////                    $data['footage'] = null;
+////                }
+//            } else {
+//                if (!empty($order['attributes']['total-area'])) {
+//                    $totalArea = $order['attributes']['total-area'];
+//                }
+//
+//                $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
+//            }
 
-                $data['footage'] = $this->getArrayByPercent($totalArea, 'footage', $data);
-            }
+            $data['footage'] = [
+                $this->removeBsp($request->get('footage_start_input')),
+                $this->removeBsp($request->get('footage_finish_input'))
+            ];
         }
 
         $budgetVolume = 150000;
@@ -79,13 +84,18 @@ class MainFilter
         }
 
         if (isset($data['budget_volume']) && !empty($budgetVolume)) {
-            $budget_volume = $this->getArrayByPercent($budgetVolume, 'budget_volume', $data);
+//            $budget_volume = $this->getArrayByPercent($budgetVolume, 'budget_volume', $data);
+//
+//            if (!empty($budget_volume)) {
+//                $data['budget_volume'] = $budget_volume;
+//            } else {
+//                $data['budget_volume'] = null;
+//            }
 
-            if (!empty($budget_volume)) {
-                $data['budget_volume'] = $budget_volume;
-            } else {
-                $data['budget_volume'] = null;
-            }
+            $data['budget_volume'] = [
+                $this->removeBsp($request->get('budget_volume_start_input')),
+                $this->removeBsp($request->get('budget_volume_finish_input'))
+            ];
         }
 
         $budgetFootage = 1500;
@@ -95,13 +105,18 @@ class MainFilter
         }
 
         if (isset($data['budget_footage']) && !empty($budgetFootage)) {
-            $budget_volume = $this->getArrayByPercent($budgetFootage, 'budget_footage', $data);
+//            $budget_volume = $this->getArrayByPercent($budgetFootage, 'budget_footage', $data);
+//
+//            if (!empty($budget_volume)) {
+//                $data['budget_footage'] = $budget_volume;
+//            } else {
+//                $data['budget_footage'] = null;
+//            }
 
-            if (!empty($budget_volume)) {
-                $data['budget_footage'] = $budget_volume;
-            } else {
-                $data['budget_footage'] = null;
-            }
+            $data['budget_footage'] = [
+                $this->removeBsp($request->get('budget_footage_start_input')),
+                $this->removeBsp($request->get('budget_footage_finish_input'))
+            ];
         }
 
         if (isset($sliderData['payback_period'])) {
@@ -109,6 +124,11 @@ class MainFilter
         }
 
         return $data;
+    }
+
+    protected function removeBsp($value)
+    {
+        return (int) str_replace(' ','', $value);
     }
 
     public function getSliderOrderData($objectTypeId, $orderCustoms, $type = 'order', $order = null)
