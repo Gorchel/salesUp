@@ -111,13 +111,13 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_start_input" value="{{isset($objectSlider['footage']['from']) ? number_format(intval($objectSlider['footage']['from']),0,' ',' ') : 80}}">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control" name="footage_value_input" data-value="{{intval($objectSlider['footage'])}}" value="{{number_format(intval($objectSlider['footage']),0,' ',' ')}}" readonly="readonly">
+                                        <input type="text" class="form-control" name="footage_value_input" data-value="{{intval($objectSlider['footage']['avg'])}}" value="{{number_format(intval($objectSlider['footage']['avg']),0,' ',' ')}}" readonly="readonly">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="footage" name="footage_finish_input" value="{{isset($objectSlider['footage']['to']) ? number_format(intval($objectSlider['footage']['to']),0,' ',' ') : 120}}">
                                     </div>
                                 </div>
                             </div>
@@ -143,13 +143,13 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_start_input" value="{{isset($objectSlider['budget_volume']['from']) ? number_format(intval($objectSlider['budget_volume']['from']),0,' ',' ') : 80}}">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control" name="budget_volume_value_input" data-value="{{intval($objectSlider['budget_volume'])}}" value="{{number_format(intval($objectSlider['budget_volume']),0,' ',' ')}}" readonly="readonly">
+                                        <input type="text" class="form-control" name="budget_volume_value_input" data-value="{{intval($objectSlider['budget_volume']['avg'])}}" value="{{number_format(intval($objectSlider['budget_volume']['avg']),0,' ',' ')}}" readonly="readonly">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="budget_volume" name="budget_volume_finish_input" value="{{isset($objectSlider['budget_volume']['to']) ? number_format(intval($objectSlider['budget_volume']['to']),0,' ',' ') : 120}}">
                                     </div>
                                 </div>
                             </div>
@@ -175,13 +175,13 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_start_input" value="{{isset($objectSlider['budget_footage']['from']) ? number_format(intval($objectSlider['budget_footage']['from']),0,' ',' ') : 80}}">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control" name="budget_footage_value_input" data-value="{{intval($objectSlider['budget_footage'])}}" value="{{number_format(intval($objectSlider['budget_footage']),0,' ',' ')}}" readonly="readonly">
+                                        <input type="text" class="form-control" name="budget_footage_value_input" data-value="{{intval($objectSlider['budget_footage']['avg'])}}" value="{{number_format(intval($objectSlider['budget_footage']['avg']),0,' ',' ')}}" readonly="readonly">
                                     </div>
                                     <div class="col-4">
-                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="0">
+                                        <input type="text" class="form-control change_value" data-key="budget_footage" name="budget_footage_finish_input" value="{{isset($objectSlider['budget_footage']['to']) ? number_format(intval($objectSlider['budget_footage']['to']),0,' ',' ') : 120}}">
                                     </div>
                                 </div>
                             </div>
@@ -306,9 +306,9 @@
                 closeOnSelect: false
             });
 
-            updateSliderInput('footage',footageSlider.getValue());
-            updateSliderInput('budget_volume',budgetVolumeSlider.getValue());
-            updateSliderInput('budget_footage',budgetFootageSlider.getValue());
+            // updateSliderInput('footage',footageSlider.getValue());
+            // updateSliderInput('budget_volume',budgetVolumeSlider.getValue());
+            // updateSliderInput('budget_footage',budgetFootageSlider.getValue());
             updateSliderInputWithoutPercent('payback_period',paybackPeriodSlider.getValue());
 
             $('body').on('change','.change_value', function() {

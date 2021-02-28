@@ -18,44 +18,6 @@ use App\Classes\Filters\FilterCompany;
  */
 class WebhookOrdersController extends Controller
 {
-//    /**
-//     * @var array
-//     */
-//    protected $filterCustomsFields = [
-//        [
-//            'type' => 'custom-64185', 'footage_before' => 'custom-63697', 'footage_after' => 'custom-63698',
-//            'budget_volume_before' => 'custom-63699', 'budget_volume_after' => 'custom-63700',
-//            'budget_footage_before' => 'custom-63701', 'budget_footage_after' => 'custom-63702',
-//            'district' => [
-//                ['custom' => 'custom-65520', 'type' => 'array'],
-//                ['custom' => 'custom-63707', 'type' => 'str']
-//            ],
-//            'metro_1' => 'custom-66364',
-//            'metro_2' => 'custom-65524',
-//            'street' => [
-//                ['custom' => 'custom-64954', 'type' => 'str'],
-//                ['custom' => 'custom-64951', 'type' => 'str']
-//            ],
-//            'enabled_field' => 'custom-63697', 'brand' => 'custom-63694',
-//        ],
-//        [
-//            'type' => 'custom-64184', 'footage_before' => 'custom-64187', 'footage_after' => 'custom-64188',
-//            'budget_volume_before' => 'custom-64189', 'budget_volume_after' => 'custom-64190',
-//            'budget_footage_before' => 'custom-64191', 'budget_footage_after' => 'custom-64192',
-//            'district' => [
-//                ['custom' => 'custom-65521', 'type' => 'array'],
-//                ['custom' => 'custom-65932', 'type' => 'str']
-//            ],
-//            'metro_1' => 'custom-66365',
-//            'metro_2' => 'custom-65526',
-//            'street' => [
-//                ['custom' => 'custom-65933', 'type' => 'str'],
-//                ['custom' => 'custom-65823', 'type' => 'str']
-//            ],
-//            'enabled_field' => 'custom-64187', 'brand' => 'custom-64183',
-//        ],
-//    ];
-
     /**
      * @var array
      */

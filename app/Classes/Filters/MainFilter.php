@@ -155,18 +155,24 @@ class MainFilter
                             $keyValue = $defaultData[$key];
                         }
 
-                        $objectSlider[$key] = $keyValue;
+                        $objectSlider[$key] = [
+                            'avg' => $keyValue,
+                        ];
                     } else {
                         $from = (int) $orderCustoms[$ranges[$key]['from']];
                         $to = (int) $orderCustoms[$ranges[$key]['to']];
 
                         $value = ($from + $to) / 2;
 
-                        if (empty($keyValue)) {
+                        if (empty($value)) {
                             $value = $defaultData[$key];
                         }
 
-                        $objectSlider[$key] = $value;
+                        $objectSlider[$key] = [
+                           'from' => $from,
+                           'to' => $to,
+                           'avg' => $value,
+                        ];
                     }
                 }
             }//Слайдеры
