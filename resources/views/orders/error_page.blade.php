@@ -12,6 +12,9 @@
 
             <p>{{$msg}}</p>
         </div>
+        <div class="col-md-6">
+            <a class="btn btn-sm btn-info" href="/weebhook_orders_filter?{{http_build_query($request)}}">Назад</a>
+        </div>
     </div>
 
     @parent

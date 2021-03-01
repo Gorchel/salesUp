@@ -142,27 +142,9 @@ class WebhookOrdersController extends Controller
         $objData['object_type'] = $object_type;
         $filterOrders = [];
 
-        if (in_array($object_type, [1,2])) {
-            //Получаем Список заявок
-            Orders::where('type',$object_type)
-                ->chunk(1000, function($orders) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData) {
-                    foreach ($orders as $order) {
-                        $orderResponse = $filterOrdersClass->filter($order, $objData, $cityTypeId);
-
-                        if (!empty($orderResponse)) {
-                            $filterOrders[] = $order;
-                        }
-                    }
-                });
-
-            if (empty($filterOrders)) {
-                $msg = "Заявки не найдены";
-                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-            }
-        } else {
-            //Получаем Список заявок
-            Properties::where('type', $object_type)
-                ->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData, $object_type) {
+        //Получаем Список заявок
+        Properties::where('type', $object_type)
+            ->chunk(1000, function($properties) use (&$filterOrders, $filterOrdersClass, $cityTypeId, $objData, $object_type) {
                 foreach ($properties as $property) {
                     $orderResponse = $filterOrdersClass->filterProperty($property, $objData, $cityTypeId, $object_type);
 
@@ -172,10 +154,13 @@ class WebhookOrdersController extends Controller
                 }
             });
 
-            if (empty($filterOrders)) {
-                $msg = "Объекты недвижимости не найдены";
-                return view('objects.error_page', ['msg' => $msg, 'errors' => $this->getErrors($request, $objData)]);
-            }
+        if (empty($filterOrders)) {
+            $msg = "Объекты недвижимости не найдены";
+            return view('orders.error_page', [
+                'msg' => $msg,
+                'errors' => $this->getErrors($request, $objData),
+                'request' => $this->prepareRequest($request)
+            ]);
         }
 //        dd($filterOrders);
         //прописываем связи
@@ -305,6 +290,18 @@ class WebhookOrdersController extends Controller
         ];
 
         return view('orders.success', $viewData);
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    protected function prepareRequest($request)
+    {
+        return [
+            'token' => $request->get('token'),
+            'ids' => [$request->get('id')],
+        ];
     }
 
     /**
