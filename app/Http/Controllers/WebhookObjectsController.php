@@ -12,6 +12,7 @@ use App\Classes\Filters\MainFilter;
 use App\Classes\Filters\FilterOrders;
 use App\Classes\Filters\FilterCompany;
 use App\Orders;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Class WebhookObjectsController
@@ -317,6 +318,9 @@ class WebhookObjectsController extends Controller
                 'attributes' => [
                     'name' => $address,
                     'description' => $object['id'],
+                    'customs' => [
+                        'custom-65822' => $object['attributes']['customs']['custom-62518'],
+                    ],
                 ],
                 'relationships' => [
                     'contacts' => [

@@ -167,7 +167,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1"  checked="checked">
+                                    <input type="checkbox" class="custom-control-input" id="customCheckThree" name="budget_footage_check" value="1">
                                     <label class="custom-control-label" for="customCheckThree">По бюджету за 1 кв/м в мес</label>
                                 </div>
                                 <input id="budget_footage" name="budget_footage" type="text" class="btm-color" value="" data-slider-min="-100" data-slider-max="100" data-slider-step="5" data-slider-value="[-20,20]" style="width: 80%;"/>&nbsp;<b> %</b>

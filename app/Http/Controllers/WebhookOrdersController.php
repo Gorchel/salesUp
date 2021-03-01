@@ -162,7 +162,7 @@ class WebhookOrdersController extends Controller
                 'request' => $this->prepareRequest($request)
             ]);
         }
-//        dd($filterOrders);
+
         //прописываем связи
         $companies = [];
         $contacts = [];
