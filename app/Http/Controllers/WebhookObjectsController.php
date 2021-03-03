@@ -301,8 +301,6 @@ class WebhookObjectsController extends Controller
                 }
             }
 
-            dd($companiesData);
-
             $contactsData = [];
 
             if (!empty($contacts)) {
