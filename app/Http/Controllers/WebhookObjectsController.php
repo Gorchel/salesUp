@@ -276,20 +276,32 @@ class WebhookObjectsController extends Controller
 
             if (!empty($companies)) {
                 foreach ($companies as $companyId) {
-//                $company = $methods->getCompany($companyId);
-//
-//                if (!empty($company['relationships']['contacts']['data'])) {
-//                    foreach ($company['relationships']['contacts']['data'] as $contact) {
-//                        $contacts[$contact['id']] = $contact['id'];
-//                    }
-//                }
+                    try {
+                        $company = $methods->getCompany($companyId);
 
-                    $companiesData[] = [
-                        'type' => 'companies',
-                        'id' => $companyId,
-                    ];
+                        if (isset($company['relationships']['status']['data']) && !empty($company['relationships']['status']['data'])) {
+                            if ($company['relationships']['status']['data']['id'] != 113375) {//Не актиывный статус не записываем
+                                continue;
+                            }
+                        }
+
+                        $companiesData[] = [
+                            'type' => 'companies',
+                            'id' => $companyId,
+                        ];
+
+                        if (!empty($company['relationships']['contacts']['data'])) {
+                            foreach ($company['relationships']['contacts']['data'] as $contact) {
+                                $contacts[$contact['id']] = $contact['id'];
+                            }
+                        }
+                    } catch(\Exception $exception) {
+
+                    }
                 }
             }
+
+            dd($companiesData);
 
             $contactsData = [];
 

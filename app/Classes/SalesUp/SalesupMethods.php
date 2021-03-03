@@ -224,7 +224,7 @@ class SalesupMethods
         $path = 'companies/'.$companyId;
 
         $data = [
-            'include' => 'contacts',
+            'include' => 'contacts,status',
         ];
 
         $jsonResponse = $this->getRequest($path, $data);
