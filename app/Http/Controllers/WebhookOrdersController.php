@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\SalesUp\SalesupMethods;
+use App\Company;
 use App\Orders;
 use App\Properties;
 use Illuminate\Http\Request;
@@ -154,6 +155,8 @@ class WebhookOrdersController extends Controller
                 }
             });
 
+        dd($filterOrders);
+
         if (empty($filterOrders)) {
             $msg = "Объекты недвижимости не найдены";
             return view('orders.error_page', [
@@ -164,7 +167,7 @@ class WebhookOrdersController extends Controller
         }
 
         //прописываем связи
-        $companies = [];
+        $companiesIds = [];
         $contacts = [];
 
         foreach ($filterOrders as $filterOrder) {
@@ -173,7 +176,7 @@ class WebhookOrdersController extends Controller
             //Компании
             if (!empty($relationships['companies']['data'])) {
                 foreach ($relationships['companies']['data'] as $company) {
-                    $companies[$company['id']] = $company['id'];
+                    $companiesIds[] = $company['id'];
                 }
             }
 
@@ -202,33 +205,29 @@ class WebhookOrdersController extends Controller
         }
 
         //Проверяем компании
+        //Проверяем компании
         $companiesData = [];
 
-        if (!empty($companies)) {
-            foreach ($companies as $companyId) {
-                try {
-                    $company = $methods->getCompany($companyId);
+        if (!empty($companiesIds)) {
+            Company::whereIn('id', $companiesIds)
+                ->chunk(1000, function($companies) use (&$contacts, &$companiesData) {
+                    foreach ($companies as $company) {
+                        $companiesData[] = [
+                            'type' => 'companies',
+                            'id' => $company['id'],
+                        ];
 
-                    if (isset($company['relationships']['status']['data']) && !empty($company['relationships']['status']['data'])) {
-                        if ($company['relationships']['status']['data']['id'] != 113375) {//Не актиывный статус не записываем
-                            continue;
+                        $relationships = json_decode($company['relationships'], true);
+
+                        if (!empty($relationships['contacts'])) {
+                            foreach ($relationships['contacts'] as $contact) {
+                                if (!empty($contact['data'])) {
+                                    $contacts[$contact['data']['id']] = $contact['data']['id'];
+                                }
+                            }
                         }
                     }
-
-                    $companiesData[] = [
-                        'type' => 'companies',
-                        'id' => $companyId,
-                    ];
-
-                    if (!empty($company['relationships']['contacts']['data'])) {
-                        foreach ($company['relationships']['contacts']['data'] as $contact) {
-                            $contacts[$contact['id']] = $contact['id'];
-                        }
-                    }
-                } catch(\Exception $exception) {
-
-                }
-            }
+                });
         }
 
         $contactsData = [];

@@ -107,6 +107,35 @@ class SalesupMethods
     }
 
     /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getPaginationCompany($number = 1, $size = 100, $filters = [])
+    {
+        $path = 'companies';
+
+        $data = [
+            'include' => 'contacts,status',
+            'page' => [
+                'number' => $number,
+                'size' => $size,
+            ],
+        ];
+
+        if (!empty($filters)) {
+            $data['filter'] = $filters;
+        }
+
+        $jsonResponse = $this->getRequest($path, $data);
+
+        $response = json_decode($jsonResponse, true);
+
+        $this->handleError($response, '. Method getPaginationCompany.');
+
+        return $response;
+    }
+
+    /**
      * @param $orderId
      * @return mixed
      * @throws \Exception

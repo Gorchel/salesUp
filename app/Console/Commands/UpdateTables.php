@@ -5,6 +5,7 @@ use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Orders;
 use App\Properties;
+use App\Company;
 
 /**
  * Class UpdateTables
@@ -16,6 +17,10 @@ class UpdateTables extends Command
      *
      */
     const COUNT_PER_PAGE = 100;
+
+    const ORDERS_TYPE = 'orders';
+    const PROPERTIES_TYPE = 'property';
+    const COMPANY_TYPE = 'company';
 
     /**
      * The name and signature of the console command.
@@ -63,7 +68,7 @@ class UpdateTables extends Command
             $filters['updated-at-gte'] = $now->startOfDay()->format('Y.m.d H:s');
         }
 
-        if ($type == 'orders') {
+        if ($type == self::ORDERS_TYPE) {
             //Получаем Список заявок
             $ordersData = $methods->getOrders(1, self::COUNT_PER_PAGE, $filters);
 
@@ -79,7 +84,7 @@ class UpdateTables extends Command
                     }
                 }
             }
-        } else {
+        } else if($type == self::PROPERTIES_TYPE)  {
             //Получаем Список недвижки
             $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE, $filters);
 
@@ -95,7 +100,25 @@ class UpdateTables extends Command
                     }
                 }
             }
+        } else if($type == self::COMPANY_TYPE)  {
+            //Получаем Список недвижки
+            $companyData = $methods->getPaginationCompany(1, self::COUNT_PER_PAGE, $filters);
+
+            if (!empty($companyData['data'])) {
+                $this->eachCompany($companyData['data']);
+
+                $pageNumber = $companyData['meta']['page-count'];
+
+                if ($pageNumber > 1) {
+                    for ($page = 2; $page<=$pageNumber; $page++) {
+                        $companyData = $methods->getPaginationCompany($page, self::COUNT_PER_PAGE, $filters);
+                        $this->eachCompany($companyData['data']);
+                    }
+                }
+            }
         }
+
+        return true;
     }
 
     /**
@@ -118,6 +141,18 @@ class UpdateTables extends Command
         if (!empty($properties)) {
             foreach ($properties as $orderKey => $property) {
                 $this->storeProperty($property);
+            }
+        }
+    }
+
+    /**
+     * @param $companies
+     */
+    protected function eachCompany($companies)
+    {
+        if (!empty($companies)) {
+            foreach ($companies as $orderKey => $company) {
+                $this->storeCompany($company);
             }
         }
     }
@@ -263,5 +298,66 @@ class UpdateTables extends Command
             default:
                 return null;
         }
+    }
+
+    /**
+     * @param $property
+     */
+    public function storeCompany($company)
+    {;
+        $attributes = $company['attributes'];
+        $relationships = $company['relationships'];
+
+        $companyModel = Company::where('id', $company['id'])
+            ->first();
+
+        $status = null;
+
+        if (isset($relationships['status']['data']) && !empty($relationships['status']['data'])) {
+            $status = $relationships['status']['data']['id'];
+
+            if ($status != Company::NOT_ACTIVE_STATUS) {//Не актиывный статус не записываем
+                if (!empty($companyModel)) {
+                    $companyModel->delete();
+                }
+
+                return;
+            }
+        }
+
+        $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
+
+        if (!empty($attributes['discarded-at'])) {
+            if (!empty($companyModel)) {
+                $companyModel->delete();
+            }
+            return;
+        }
+
+        if (empty($companyModel)) {
+            $companyModel = new Company();
+            $companyModel->id = $company['id'];
+            $companyModel->created_at = $now;
+        } else {
+            if ($companyModel->updated_at == $now) {
+                return;
+            }
+        }
+
+        $companyModel->updated_at = $now;
+        $companyModel->customs = json_encode($attributes['customs']);
+        $companyModel->status = $status;
+
+        unset($attributes['customs']);
+
+        $companyModel->attributes = json_encode($attributes);
+
+        $relationshipsArray = [
+            'contacts' => $relationships['contacts'],
+            'companies' => $relationships['status'],
+        ];
+
+        $companyModel->relationships = json_encode($relationshipsArray);
+        $companyModel->save();
     }
 }
