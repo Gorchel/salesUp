@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1">
+                        <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1" checked="checked">
                         <label class="custom-control-label" for="type_of_property_check">По типу недвижимости</label>
                     </div>
                     <select name="type_of_property[]" id="type_of_property" class="form-control" multiple="multiple">
