@@ -88,7 +88,7 @@ class UpdateTables extends Command
             }
         } else if($type == self::PROPERTIES_TYPE)  {
             //Получаем Список недвижки
-            $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE, $filters);
+            $propertyData = $methods->getPaginationObjects(1, self::COUNT_PER_PAGE);
 
             if (!empty($propertyData['data'])) {
                 $this->eachProperties($propertyData['data']);
@@ -97,7 +97,7 @@ class UpdateTables extends Command
 
                 if ($pageNumber > 1) {
                     for ($page = 2; $page<=$pageNumber; $page++) {
-                        $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE, $filters);
+                        $propertyData = $methods->getPaginationObjects($page, self::COUNT_PER_PAGE);
                         $this->eachProperties($propertyData['data']);
                     }
                 }
