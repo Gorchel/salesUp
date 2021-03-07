@@ -28,7 +28,13 @@ class Kernel extends ConsoleKernel
             'type' => 'orders',
             'dayUpdated' => 2
         ])->everyFiveMinutes();
-        $schedule->call("update_tables:init property 2")->everyFiveMinutes();
-        $schedule->call("update_tables:init company 2")->everyFiveMinutes();
+        $schedule->call("update_tables:init", [
+            'type' => 'property',
+            'dayUpdated' => 2
+        ])->everyFiveMinutes();
+        $schedule->call("update_tables:init", [
+            'type' => 'company',
+            'dayUpdated' => 2
+        ])->everyFiveMinutes();
     }
 }
