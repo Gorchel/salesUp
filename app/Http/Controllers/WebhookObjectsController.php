@@ -345,6 +345,8 @@ class WebhookObjectsController extends Controller
                 ],
             ];
 
+            dd($data);
+
             $dealResponse = $methods->dealCreate($data);
 
             $objDeals = [];

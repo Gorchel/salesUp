@@ -54,6 +54,7 @@ class UpdateTables extends Command
      */
     public function handle()
     {
+        \Log::info('run '.$this->argument('type').' '.$this->argument('dayUpdated'));
         $handler = new SalesupHandler(env('API_TOKEN'));
         $methods = $handler->methods;
 
@@ -304,7 +305,7 @@ class UpdateTables extends Command
      * @param $property
      */
     public function storeCompany($company)
-    {;
+    {
         $attributes = $company['attributes'];
         $relationships = $company['relationships'];
 
