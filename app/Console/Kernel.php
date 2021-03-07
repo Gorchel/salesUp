@@ -26,12 +26,12 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command("update_tables:init", [
             'orders', 2
-        ])->everyMinute();
+        ])->everyFiveMinutes();
         $schedule->command("update_tables:init", [
             'property', 2
-        ])->everyMinute();
+        ])->everyFiveMinutes();
         $schedule->command("update_tables:init", [
             'company', 2
-        ])->everyMinute();
+        ])->everyFiveMinutes();
     }
 }
