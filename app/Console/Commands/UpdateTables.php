@@ -59,6 +59,7 @@ class UpdateTables extends Command
         $methods = $handler->methods;
 
         $dayUpdated = $this->argument('dayUpdated');
+        \Log::info($dayUpdated);
         $type = $this->argument('type');
         $filters = [];
 
