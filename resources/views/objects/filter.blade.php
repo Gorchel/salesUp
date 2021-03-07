@@ -21,6 +21,14 @@
             </div>
             <div class="row">
                 <div class="col-lg-10 offset-lg-1 form-group">
+                    <select name="city_type" id="city_type" class="form-control">
+                        <option value="2" {{$cityTypeId == 2 ? 'selected="selected"' : ''}}>Санкт-Петербург</option>
+                        <option value="1" {{$cityTypeId == 1 ? 'selected="selected"' : ''}}>Москва</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-10 offset-lg-1 form-group">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="type_of_property_check" name="type_of_property_check" value="1">
                         <label class="custom-control-label" for="type_of_property_check">По типу недвижимости</label>
@@ -316,9 +324,12 @@
                 }
             });
 
+            $('body').on('change','select#city_type', function() {
+                changeLocation();
+            });
+
             $('body').on('change','select#object_type', function() {
-                // changeObjType()
-                location.href = location.href + '&object_type=' + $("select#object_type option:selected").val();
+                changeLocation();
             });
 
             $('body').on('change', '#select-all-checkboxes', function() {
@@ -338,6 +349,11 @@
                 location.href = location.origin + '/weebhook_estate_get?' + $(this).serialize();
             })
         });
+
+        function changeLocation()
+        {
+            location.href = location.href + '&object_type=' + $("select#object_type option:selected").val() + '&city_type=' + $("select#city_type option:selected").val();
+        }
 
         function updateSlider(realVal, value)
         {

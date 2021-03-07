@@ -117,11 +117,12 @@ class WebhookObjectsController extends Controller
         $address = $object['attributes']['address'];
 
         $objectType = $request->has('object_type') ? $request->get('object_type') : 4;
+        $cityTypeId = $request->has('city_type') ? $request->get('city_type') : 2;
 
-        $filterClass = new MainFilter();
+//        $filterClass = new MainFilter();
 
         //Конфиги
-        $metroSelect = config('metro')[$filterClass->checkCity($address)];//Метро по городу
+        $metroSelect = config('metro')[$cityTypeId];//Метро по городу
         $companyTypes = config('company_types');//Вид деятельности
         $typeOfProperties = config('type_of_property')[$objectType];//Тип недвижимости
 
@@ -168,6 +169,7 @@ class WebhookObjectsController extends Controller
             'objectSlider' => $objectSlider,
             'typeOfPropertyObj' => $typeOfPropertyObj,
             'objectType' => $objectType,
+            'cityTypeId' => $cityTypeId,
         ];
 
         return view('objects.filter', $data);
