@@ -129,6 +129,10 @@ class FilterOrders
                     1 => ['custom' => 'custom-67940', 'type' => 'array'],//msk
                     2 => ['custom' => 'custom-67939', 'type' => 'array'],//spb
                 ],
+                'street' => [
+                    1 => ['custom' => 'custom-67921', 'type' => 'array'],//msk
+                    2 => ['custom' => 'custom-67916', 'type' => 'str'],//spb
+                ],
             ],
             'type_of_activity' => 'custom-69022',
         ],
@@ -284,7 +288,7 @@ class FilterOrders
                     if (empty(array_intersect($objectValue, $valueArray))) {
                         return false;
                     }
-                } {//test
+                } else {//test
                     return false;
                 }
             }
