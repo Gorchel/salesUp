@@ -236,7 +236,6 @@ class UpdateTables extends Command
         $propertyModel = Properties::where('id', $property['id'])
             ->first();
 
-
         $now = Carbon::now('Africa/Nairobi')->format('Y-m-d H:i:s');
 
         if (!isset($attributes['customs']['custom-71235'][0]) || !in_array(
@@ -248,8 +247,6 @@ class UpdateTables extends Command
 
             return;
         }
-
-
 
         if (!empty($attributes['discarded-at'])) {
             if (!empty($propertyModel)) {

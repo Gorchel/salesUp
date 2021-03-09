@@ -136,8 +136,11 @@ class WebhookOrdersController extends Controller
         $objData = $filterClass->prepareData($request, $order, 'order', $object_type);
 
         if (empty($objData)) {
-            $msg = "Выберите фильтры";
-            return view('objects.error_page', ['msg' => $msg]);
+            return view('orders.error_page', [
+                'msg' => "Выберите фильтры",
+                'errors' => $this->getErrors($request, $objData),
+                'request' => $this->prepareRequest($request)
+            ]);
         }
 
         $objData['object_type'] = $object_type;
@@ -154,8 +157,6 @@ class WebhookOrdersController extends Controller
                     }
                 }
             });
-
-        dd($filterOrders);
 
         if (empty($filterOrders)) {
             $msg = "Объекты недвижимости не найдены";
